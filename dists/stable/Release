@@ -1,0 +1,15 @@
+Origin: Twilight
+Label: termux-repo
+Codename: stable
+Architectures: aarch64 all x86_64 
+Components: main
+Description: Twilight custom termux repository
+Suite: stable
+Date: Fri, 16 Oct 2026 04:18:49 +0000
+SHA256:
+ 08e422282599fba9ff2bb4763e25300164820ad20053fd597f999384ff4ec275 5167 main/binary-aarch64/Packages
+ 10c382f45e51ad6bb2dca7a44072eebe511c4a5309eb6ffd211e4dc65099e5e0 2184 main/binary-aarch64/Packages.xz
+ 5d3e9dce700d7587702cbd4ec278e5acc4867e89d4150cfc8e6b86a21cae6f11 5109 main/binary-all/Packages
+ ea2616ffb45c7a3778ee2136928a2f52947b7a6ef146e3e149668b333ba0dbda 2296 main/binary-all/Packages.xz
+ 790d8638b4c0af8b4280c8109dfdca8b3e0825558b2722e59273d53ac660623a 4427 main/binary-x86_64/Packages
+ f6ed1c9d517b22eae2dd5d30889a2d8a3c0a7fe4aef8c2ce82f2fbea9936902b 1908 main/binary-x86_64/Packages.xz

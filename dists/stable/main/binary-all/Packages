@@ -1,0 +1,135 @@
+Package: 9router
+Version: 0.5.99-1
+Architecture: all
+Maintainer: Twilight <twilight@aliveos.org>
+Installed-Size: 0
+Depends: nodejs-lts | nodejs
+Section: devel
+Priority: optional
+Homepage: https://github.com/decolua/9router
+Description: Free AI coding router with smart fallback
+ Local AI model router that connects coding agents (Claude Code, Codex,
+ Cline, Muse Code, etc.) to free and paid providers via an OpenAI-compatible
+ endpoint. Features smart auto-fallback, provider health checks, and a
+ web dashboard at localhost:20128.
+Filename: pool/main/9router_0.5.99-1_all.deb
+Size: 1152
+MD5sum: c43fa94df8ba9d5745145eb0d9f1eb3c
+SHA1: 2c4ddd651fbabb4243961b25d6be4ef5c97cf9aa
+SHA256: c8a65016789ae601699ad03f8bc92db4c3eae53fd5ccdf3eaacc5bf99cb2c9b2
+
+Package: curl-cffi
+Version: 0.16.3-1
+Architecture: all
+Maintainer: Twilight <twilight@aliveos.org>
+Installed-Size: 0
+Depends: python
+Section: python
+Priority: optional
+Homepage: https://github.com/Twilight0/curl-cffi-builder
+Description: Browser TLS fingerprint impersonation for Python
+ curl-impersonate binding (Chrome/Safari TLS fingerprints) built for
+ Android. Unlocks yt-dlp --impersonate and bot-aware scraping on Termux.
+ Wheels come from curl-cffi-builder releases; the cffi dependency is
+ built locally and needs: pkg install clang libffi.
+Filename: pool/main/curl-cffi_0.16.3-1_all.deb
+Size: 1484
+MD5sum: a00b8f32beeb2087733d848cc24eb2f7
+SHA1: 3936770c293ee08e995eb7445e6764a9a3297562
+SHA256: 5fdc2ecd582df30e236a8914ada48d4e02531502d555ebc7c11e7a8779891f03
+
+Package: pipx
+Version: 1.18.1-1
+Architecture: all
+Maintainer: Twilight <twilight@aliveos.org>
+Installed-Size: 
+Depends: python, python-pip
+Section: python
+Priority: optional
+Homepage: https://github.com/pypa/pipx
+Description: Install and run Python applications in isolated environments
+ pipx installs Python CLIs (yt-dlp, black, gallery-dl, ...) into
+ isolated venvs and exposes their binaries on PATH. Drop-in return
+ of the package removed from upstream Termux repos.
+Filename: pool/main/pipx_1.18.1-1_all.deb
+Size: 1188
+MD5sum: b334a3838b2b71151e7d836c0d9dae1e
+SHA1: 4df291d822db7c7875ed2eb47062d788c5e81fab
+SHA256: 768283007e77b83aef1a4872952bda77733024fb0bc3c92efe5bdefe49963ce2
+
+Package: termux-mcp
+Version: 0.15.0-1
+Architecture: all
+Maintainer: Twilight <twilight@aliveos.org>
+Installed-Size: 0
+Depends: python, python-pip
+Section: devel
+Priority: optional
+Homepage: https://github.com/termuxgpt/termux-mcp
+Description: Termux REST API daemon + native MCP server for AI agents
+ Lightweight HTTP server running inside Termux, exposing shell
+ execution and device capabilities as a streaming API for AI agents
+ and LLM tool-calling. Ships both 'termux-mcp' (REST on :8080) and
+ 'termux-native-mcp' (Model Context Protocol on :8081 / stdio).
+Filename: pool/main/termux-mcp_0.15.0-1_all.deb
+Size: 1120
+MD5sum: 252421b066b1cdaa55fcf32822c984de
+SHA1: 9a059c617f47ac925866cfc5f9e83b4c64048f32
+SHA256: 61ec7d7b32a447f16e7a244843b03201cbb90d03b32c025c48f15e1e60842a25
+
+Package: wrangler
+Version: 4.151.0-1
+Architecture: all
+Maintainer: Twilight <twilight@aliveos.org>
+Installed-Size: 0
+Depends: nodejs-lts | nodejs
+Section: devel
+Priority: optional
+Homepage: https://developers.cloudflare.com/workers/wrangler/
+Description: Cloudflare Workers CLI
+ Cloudflare Workers command-line tooling. Cloud API commands only
+ (deploy, tail, pages, r2, kv, etc). Local dev server (wrangler dev)
+ is not supported on Termux as workerd does not ship Android binaries.
+Filename: pool/main/wrangler_4.151.0-1_all.deb
+Size: 1528
+MD5sum: 5f7073286ab14010ec2be55001699cfc
+SHA1: 1b7f6a4b25e9fac5b1b7742f7001ed8929cbc962
+SHA256: 51ff3a76942f78226d5b4b8b179e0c887f9a1ff9a974ab0f082f447021c4ba53
+
+Package: yt-dlp-git
+Version: 2026.10.15-1
+Architecture: all
+Maintainer: Twilight <twilight@aliveos.org>
+Installed-Size: 0
+Depends: python, git
+Section: video
+Priority: optional
+Homepage: https://github.com/yt-dlp/yt-dlp
+Description: Video/audio downloader, git master snapshot
+ yt-dlp installed straight from upstream master, so site extractors
+ are days (not months) old. Reinstall/upgrade the package to pull the
+ latest fixes. Pair with curl-cffi for --impersonate support.
+Filename: pool/main/yt-dlp-git_2026.10.15-1_all.deb
+Size: 1056
+MD5sum: eebb18306e4e27382daf7cef9d551de9
+SHA1: 53c4422c6c6f42ce0db7399c6e0599f10c73ee8f
+SHA256: 6e7e0d1200a3f04c131630c9539c46e3afeaed5aa3207cd38658fbb728ead3bc
+
+Package: yt-tui
+Version: 1.1.0-1
+Architecture: all
+Maintainer: Twilight <twilight@aliveos.org>
+Installed-Size: 
+Depends: python, ffmpeg, git, yt-dlp | yt-dlp-git
+Section: video
+Priority: optional
+Homepage: https://github.com/Twilight0/yt-tui
+Description: Curses TUI for yt-dlp with search and queueing
+ Single-file Python curses interface for downloading video/audio
+ with yt-dlp: YouTube search (videos + playlists), format picker,
+ queue progress, history and mpv-style playback via termux-open.
+Filename: pool/main/yt-tui_1.1.0-1_all.deb
+Size: 1124
+MD5sum: bce573789818e7e6b28dda1ba0bb915a
+SHA1: dfa7364d325fee5fda12dd2b1769ec0eabcf95b6
+SHA256: 46dc16b92a440ed8816f935cf4002abcf06e938c0da301a7433cb9fd6e453ec8
