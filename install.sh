@@ -23,7 +23,6 @@ pkg update -y 2>/dev/null || apt update -y
 echo ""
 echo "Done! Available packages:"
 echo "  pkg install curl-cffi          # TLS impersonation for Python"
-echo "  pkg install agentty            # AI pair programmer (native)"
 echo "  pkg install muse-code          # Meta's Muse Code agent"
 echo "  pkg install opencode           # AI coding assistant"
 echo "  pkg install antigravity-cli    # Google Antigravity CLI"

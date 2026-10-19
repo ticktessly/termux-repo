@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y dpkg-dev gcc-aarch64-linux-gnu upx-ucl cmake ninja-build ccache git perl python3 pkg-config
+          sudo apt-get install -y dpkg-dev gcc-aarch64-linux-gnu upx-ucl git perl python3 pkg-config
 
       - name: Create output directory
         run: mkdir -p debs
@@ -50,87 +50,6 @@ jobs:
       # --- curl-cffi (pip wrapper, arch detected at install time) ---
       - name: Build curl-cffi
         run: bash scripts/build-deb.sh packages/curl-cffi debs/
-
-      # --- agentty: NDK cross-compile for Android (aarch64 + x86_64) ---
-      # AGENTTY_VERSION is the latest release, resolved in the step above.
-
-      - name: Set up NDK r30
-        id: setup-ndk
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r30
-
-      - name: Restore ccache
-        uses: actions/cache@v4
-        with:
-          path: ~/.ccache
-          key: agentty-ccache-r30-${{ env.AGENTTY_VERSION }}-${{ hashFiles('packages/agentty/android-epoll.patch', 'packages/agentty/android-claybin.patch') }}
-          restore-keys: agentty-ccache-r30-${{ env.AGENTTY_VERSION }}-
-
-      - name: Checkout agentty sources
-        uses: actions/checkout@v4
-        with:
-          repository: 1ay1/agentty
-          ref: v${{ env.AGENTTY_VERSION }}
-          submodules: recursive
-          path: agentty-src
-
-      - name: Apply Android patches
-        run: |
-          set -euo pipefail
-          git -C agentty-src/third_party/maya/third_party/jaal apply --check "$GITHUB_WORKSPACE/packages/agentty/android-epoll.patch"
-          git -C agentty-src/third_party/claybin apply --check "$GITHUB_WORKSPACE/packages/agentty/android-claybin.patch"
-          git -C agentty-src/third_party/maya/third_party/jaal apply "$GITHUB_WORKSPACE/packages/agentty/android-epoll.patch"
-          git -C agentty-src/third_party/claybin apply "$GITHUB_WORKSPACE/packages/agentty/android-claybin.patch"
-
-      - name: Restore Android dep builds
-        id: dep-cache
-        uses: actions/cache/restore@v4
-        with:
-          path: agentty-deps
-          key: agentty-termux-deps-${{ env.AGENTTY_VERSION }}-${{ hashFiles('packages/agentty/build-deps-android.sh') }}
-
-      - name: Build OpenSSL + nghttp2 for Android
-        if: steps.dep-cache.outputs.cache-hit != 'true'
-        env:
-          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-        run: |
-          ANDROID_NDK_HOME="$ANDROID_NDK_HOME" \
-            bash packages/agentty/build-deps-android.sh arm64-v8a "$GITHUB_WORKSPACE/agentty-deps/arm64-v8a"
-
-      - name: Save Android dep builds
-        if: steps.dep-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: agentty-deps
-          key: agentty-termux-deps-${{ env.AGENTTY_VERSION }}-${{ hashFiles('packages/agentty/build-deps-android.sh') }}
-
-      - name: Configure and build agentty (arm64-v8a only; upstream targets aarch64-linux-android)
-        env:
-          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-        run: |
-          export CCACHE_DIR=~/.ccache
-          DEP="$GITHUB_WORKSPACE/agentty-deps/arm64-v8a"
-          export PKG_CONFIG_PATH="$DEP/lib/pkgconfig"
-          cmake -S agentty-src -B agentty-build-arm64-v8a -G Ninja \
-            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" \
-            -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-24 \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="$DEP" \
-            -DCMAKE_EXE_LINKER_FLAGS="-L$DEP/lib" \
-            -DOPENSSL_ROOT_DIR="$DEP" \
-            -DOPENSSL_SSL_LIBRARY="$DEP/lib/libssl.so" \
-            -DOPENSSL_CRYPTO_LIBRARY="$DEP/lib/libcrypto.so" \
-            -DOPENSSL_INCLUDE_DIR="$DEP/include" \
-            -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DAGENTTY_AUTO_PULL_MAYA=OFF -DAGENTTY_STANDALONE=OFF -DAGENTTY_BUILD_TESTS=OFF \
-            -DMAYA_NATIVE_TUNING=OFF
-          cmake --build agentty-build-arm64-v8a --target agentty -j"$(nproc)"
-          ccache -s || true
-
-      # --- agentty deb from the NDK cross-compile above ---
-      - name: Build agentty (aarch64)
-        run: AGENTTY_BIN="$GITHUB_WORKSPACE/agentty-build-arm64-v8a/agentty" bash packages/agentty/build.sh aarch64
 
       # --- muse-code (both architectures) ---
       - name: Build muse-code (aarch64)

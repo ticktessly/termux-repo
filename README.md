@@ -13,7 +13,6 @@ curl -sL https://ticktessly.github.io/termux-repo/install.sh | bash
 | Package | Description | Arch |
 |---------|-------------|------|
 | `curl-cffi` | Browser TLS impersonation for Python (yt-dlp --impersonate) | all |
-| `agentty` | Blazing-fast AI pair programmer, native Bionic build | aarch64 |
 | `muse-code` | Meta's Muse Code AI agent with session/MCP tools | aarch64, x86_64 |
 | `opencode` | AI-powered coding assistant (v2, no proot) | aarch64, x86_64 |
 | `antigravity-cli` | Google Antigravity CLI | aarch64, x86_64 |
@@ -86,7 +85,7 @@ GitHub Actions builds all packages weekly and deploys to GitHub Pages. Push to `
 
 Every weekly run resolves the **latest upstream version** for each package
 before building (`scripts/resolve-versions.sh`): PyPI (curl-cffi), GitHub
-releases (agentty, oh-my-pi, copilot-cli, curl-cffi wheels),
+releases (oh-my-pi, copilot-cli, curl-cffi wheels),
 Meta's Muse channel manifest (version + sha256), and an upward probe
 of the opencode.ai CDN (no version feed is published for opencode v2).
 The resolved versions are stamped into each package, so `apt upgrade`

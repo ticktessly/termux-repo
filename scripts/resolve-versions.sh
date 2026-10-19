@@ -103,9 +103,6 @@ print(cc)' "$CCVER")" = "1" ]; then
     export_var CURL_CFFI_TAG     "$CC_TAG"
 fi
 
-# --- agentty: latest release of 1ay1/agentty (also drives the source checkout ref) ---
-export_var AGENTTY_VERSION "$(latest_release 1ay1/agentty)"
-
 # --- opencode (v2): binaries only on opencode.ai, no version feed. Probe
 #     upward from the repo's fallback until the URL 404s. ---
 OC_BASE="${OPENCODE_VERSION:-$(grep -m1 'OPENCODE_VERSION:-' packages/opencode/build.sh \
