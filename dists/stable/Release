@@ -1,0 +1,13 @@
+Origin: ticktessly
+Label: termux-repo
+Codename: stable
+Architectures: aarch64 all 
+Components: main
+Description: ticktessly custom termux repository
+Suite: stable
+Date: Mon, 19 Oct 2026 23:27:12 +0000
+SHA256:
+ 3e04f511740a5f919161f47ed267f5ffa97a6573e28cc6aa283fed0935d968e9 3816 main/binary-aarch64/Packages
+ 8bbcb021518f8545489628eb31999799c318f33fa97d0bf8a36f73449e343a21 1704 main/binary-aarch64/Packages.xz
+ 3a05273850202ef17474536a51142b5f6caf74bc1dd3cb278bf3114941829d7b 796 main/binary-all/Packages
+ 4cd2e740d6269421092d54bdee24d9f7a919eb7ba095583a075705795030c3bb 612 main/binary-all/Packages.xz
