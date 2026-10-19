@@ -49,14 +49,19 @@ jobs:
           import os
           import subprocess
 
-          expected = {
-              "curl-cffi": f"{os.environ.get('CURL_CFFI_VERSION', '')}-1",
-              "muse-code": f"{os.environ.get('MUSE_PKGVER', '')}-1",
-              "opencode": f"{os.environ.get('OPENCODE_VERSION', '')}-1",
-              "antigravity-cli": f"{os.environ.get('AGY_VERSION', '')}-1",
-              "oh-my-pi": f"{os.environ.get('OMP_VERSION', '')}-1",
-              "copilot-cli": f"{os.environ.get('COPILOT_CLI_VERSION', '')}-1",
+          package_env = {
+              "curl-cffi": "CURL_CFFI_VERSION",
+              "muse-code": "MUSE_PKGVER",
+              "opencode": "OPENCODE_VERSION",
+              "antigravity-cli": "AGY_VERSION",
+              "oh-my-pi": "OMP_VERSION",
+              "copilot-cli": "COPILOT_CLI_VERSION",
           }
+          expected = {}
+          for package, env_key in package_env.items():
+              resolved = (os.environ.get(env_key) or "").strip()
+              expected[package] = f"{resolved}-1" if resolved else ""
+
           try:
               packages = subprocess.check_output(
                   ["git", "show", "origin/gh-pages:dists/stable/main/binary-aarch64/Packages"],
@@ -65,6 +70,7 @@ jobs:
           except subprocess.CalledProcessError:
               packages = ""
 
+          metadata_available = bool(packages.strip())
           current = {}
           for stanza in packages.split("\n\n"):
               fields = dict(
@@ -75,15 +81,25 @@ jobs:
               if "Package" in fields and "Version" in fields:
                   current[fields["Package"]] = fields["Version"]
 
-          changed = not packages or any(
-              not version or current.get(package) != version
-              for package, version in expected.items()
-          )
+          package_changes = {}
+          for package, version in expected.items():
+              if not metadata_available:
+                  package_changes[package] = True
+              elif not version:
+                  package_changes[package] = True
+              else:
+                  package_changes[package] = current.get(package) != version
+
+          changed = any(package_changes.values())
           print("Published versions:", current or "(none)")
           print("Resolved versions:", expected)
+          print("Per-package rebuild flags:", package_changes)
           print(f"Version changes detected: {changed}")
           with open(os.environ["GITHUB_OUTPUT"], "a") as output:
               output.write(f"build={'true' if changed else 'false'}\n")
+              for package, should_build in package_changes.items():
+                  output_name = f"build_{package.replace('-', '_')}"
+                  output.write(f"{output_name}={'true' if should_build else 'false'}\n")
           PY
 
       - name: Skip build when versions are unchanged
@@ -102,32 +118,32 @@ jobs:
 
       # --- curl-cffi (pip wrapper, arch detected at install time) ---
       - name: Build curl-cffi
-        if: steps.version-check.outputs.build == 'true'
+        if: steps.version-check.outputs.build_curl_cffi == 'true'
         run: bash scripts/build-deb.sh packages/curl-cffi debs/
 
       # --- muse-code ---
       - name: Build muse-code (aarch64)
-        if: steps.version-check.outputs.build == 'true'
+        if: steps.version-check.outputs.build_muse_code == 'true'
         run: bash packages/muse-code/build.sh
 
       # --- opencode (glibc) ---
       - name: Build opencode (aarch64)
-        if: steps.version-check.outputs.build == 'true'
+        if: steps.version-check.outputs.build_opencode == 'true'
         run: bash packages/opencode/build.sh
 
       # --- antigravity-cli (glibc) ---
       - name: Build antigravity-cli (aarch64)
-        if: steps.version-check.outputs.build == 'true'
+        if: steps.version-check.outputs.build_antigravity_cli == 'true'
         run: bash packages/antigravity-cli/build.sh
 
       # --- oh-my-pi (glibc) ---
       - name: Build oh-my-pi (aarch64)
-        if: steps.version-check.outputs.build == 'true'
+        if: steps.version-check.outputs.build_oh_my_pi == 'true'
         run: bash packages/oh-my-pi/build.sh
 
       # --- copilot-cli (glibc wrapper) ---
       - name: Build copilot-cli (aarch64)
-        if: steps.version-check.outputs.build == 'true'
+        if: steps.version-check.outputs.build_copilot_cli == 'true'
         run: bash packages/copilot-cli/build.sh
 
       - name: Compress large debs with upx if needed
