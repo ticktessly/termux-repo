@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # muse-code: Prebuilt binary from Meta's CDN
-# Builds debs for aarch64 and x86_64
+# Builds the aarch64 deb.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -16,106 +16,69 @@ PKGREL="${MUSE_PKGREL:-1}"
 DEB_VERSION="${PKGVER}-${PKGREL}"
 PREFIX="data/data/com.termux/files/usr"
 
+ARCH="aarch64"
+
 # Checksums (update alongside version)
 SHA256_AARCH64="${MUSE_SHA256_AARCH64:-2e5afa5e8560c1565185249af2d27b3e97aaf351d3d32275b8e410be702dce35}"
-SHA256_X86_64="${MUSE_SHA256_X86_64:-decefc0fb33c48ee43419c3e72ac2dbc781743868611074c7292807f5960dfcf}"
 
-build_muse_deb() {
-    local ARCH="$1"
-    local FILE_SUFFIX
-    local EXPECTED_SHA
+echo "=== Building muse-code ${DEB_VERSION} (${ARCH}) ==="
 
-    case "$ARCH" in
-        aarch64)
-            FILE_SUFFIX="muse-aarch64-linux"
-            EXPECTED_SHA="$SHA256_AARCH64"
-            ;;
-        x86_64)
-            FILE_SUFFIX="muse-x86-linux"
-            EXPECTED_SHA="$SHA256_X86_64"
-            ;;
-        *)
-            echo "Error: unsupported architecture: $ARCH" >&2
-            return 1
-            ;;
-    esac
+BUILD_DIR="$(mktemp -d)"
+PKG_DIR="${BUILD_DIR}/muse-code_${DEB_VERSION}_${ARCH}"
+mkdir -p "${PKG_DIR}/DEBIAN" "${PKG_DIR}/${PREFIX}/bin" "${PKG_DIR}/${PREFIX}/lib/muse"
 
-    echo "=== Building muse-code ${DEB_VERSION} (${ARCH}) ==="
+# Download binary
+FILE_SUFFIX="muse-aarch64-linux"
+BIN_URL="https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=${REALVER}&file=${FILE_SUFFIX}"
+BIN_FILE="${BUILD_DIR}/muse-${ARCH}"
+echo "Downloading ${FILE_SUFFIX}..."
+curl -fSL "$BIN_URL" -o "$BIN_FILE"
 
-    local BUILD_DIR
-    BUILD_DIR="$(mktemp -d)"
-    local PKG_DIR="${BUILD_DIR}/muse-code_${DEB_VERSION}_${ARCH}"
-    mkdir -p "${PKG_DIR}/DEBIAN" "${PKG_DIR}/${PREFIX}/bin" "${PKG_DIR}/${PREFIX}/lib/muse"
+# Verify checksum
+ACTUAL_SHA="$(sha256sum "$BIN_FILE" | cut -d' ' -f1)"
+if [ "$ACTUAL_SHA" != "$SHA256_AARCH64" ]; then
+    echo "Error: checksum mismatch for ${ARCH}" >&2
+    echo "  Expected: $SHA256_AARCH64" >&2
+    echo "  Actual:   $ACTUAL_SHA" >&2
+    rm -rf "$BUILD_DIR"
+    exit 1
+fi
+echo "SHA256 verified: ${ACTUAL_SHA}"
 
-    # Download binary
-    local BIN_URL="https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=${REALVER}&file=${FILE_SUFFIX}"
-    local BIN_FILE="${BUILD_DIR}/muse-${ARCH}"
-    echo "Downloading ${FILE_SUFFIX}..."
-    curl -fSL "$BIN_URL" -o "$BIN_FILE"
+# Install files
+install -Dm755 "$BIN_FILE" "${PKG_DIR}/${PREFIX}/lib/muse/muse"
+install -Dm755 "$SCRIPT_DIR/muse.sh" "${PKG_DIR}/${PREFIX}/bin/muse"
+install -Dm755 "$SCRIPT_DIR/muse-session" "${PKG_DIR}/${PREFIX}/lib/muse/muse-session"
+install -Dm755 "$SCRIPT_DIR/muse-mcp" "${PKG_DIR}/${PREFIX}/lib/muse/muse-mcp"
 
-    # Verify checksum
-    local ACTUAL_SHA
-    ACTUAL_SHA="$(sha256sum "$BIN_FILE" | cut -d' ' -f1)"
-    if [ "$ACTUAL_SHA" != "$EXPECTED_SHA" ]; then
-        echo "Error: checksum mismatch for ${ARCH}" >&2
-        echo "  Expected: $EXPECTED_SHA" >&2
-        echo "  Actual:   $ACTUAL_SHA" >&2
-        rm -rf "$BUILD_DIR"
-        return 1
-    fi
-    echo "SHA256 verified: ${ACTUAL_SHA}"
+# Symlinks
+ln -sf muse "${PKG_DIR}/${PREFIX}/bin/muse-code"
+ln -sf "/${PREFIX}/lib/muse/muse-session" "${PKG_DIR}/${PREFIX}/bin/muse-session"
+ln -sf "/${PREFIX}/lib/muse/muse-mcp" "${PKG_DIR}/${PREFIX}/bin/muse-mcp"
 
-    # Install files
-    install -Dm755 "$BIN_FILE" "${PKG_DIR}/${PREFIX}/lib/muse/muse"
-    install -Dm755 "$SCRIPT_DIR/muse.sh" "${PKG_DIR}/${PREFIX}/bin/muse"
-    install -Dm755 "$SCRIPT_DIR/muse-session" "${PKG_DIR}/${PREFIX}/lib/muse/muse-session"
-    install -Dm755 "$SCRIPT_DIR/muse-mcp" "${PKG_DIR}/${PREFIX}/lib/muse/muse-mcp"
+# Calculate installed size
+INSTALLED_SIZE="$(du -sk "${PKG_DIR}/${PREFIX}" | cut -f1)"
 
-    # Symlinks
-    ln -sf muse "${PKG_DIR}/${PREFIX}/bin/muse-code"
-    ln -sf "/${PREFIX}/lib/muse/muse-session" "${PKG_DIR}/${PREFIX}/bin/muse-session"
-    ln -sf "/${PREFIX}/lib/muse/muse-mcp" "${PKG_DIR}/${PREFIX}/bin/muse-mcp"
-
-    # Calculate installed size
-    local INSTALLED_SIZE
-    INSTALLED_SIZE="$(du -sk "${PKG_DIR}/${PREFIX}" | cut -f1)"
-
-    # Determine optional dependency for x86_64
-    local OPT_DEPENDS=""
-    if [ "$ARCH" = "x86_64" ]; then
-        OPT_DEPENDS="
-Suggests: qemu-user-x86-64"
-    fi
-
-    # Write control
-    cat > "${PKG_DIR}/DEBIAN/control" << EOF
+# Write control
+cat > "${PKG_DIR}/DEBIAN/control" << EOF
 Package: muse-code
 Version: ${DEB_VERSION}
 Architecture: ${ARCH}
 Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
 Installed-Size: ${INSTALLED_SIZE}
-Depends: python, ca-certificates, proot${OPT_DEPENDS}
+Depends: python, ca-certificates, proot
 Section: devel
 Priority: optional
 Homepage: https://dev.meta.ai
 Description: Terminal-based AI coding agent powered by Meta's Muse Spark
- Packed with AVX2 legacy fallback, interactive curses TUI session picker,
+ Packed with an interactive curses TUI session picker,
  and multi-agent MCP configuration management.
 EOF
 
-    # Build deb (deterministic: stable bytes for unchanged content)
-    local DEB_FILE="${DEBS_DIR}/muse-code_${DEB_VERSION}_termux_${ARCH}.deb"
-    export REPRO_MTIME
-    REPRO_MTIME="$(git -C "$REPO_ROOT" log -1 --format=%ct -- packages/muse-code 2>/dev/null || git -C "$REPO_ROOT" log -1 --format=%ct)"
-    bash "$REPO_ROOT/scripts/build-deb.sh" "$PKG_DIR" "$DEB_FILE"
-    echo "Built: $DEB_FILE"
-    rm -rf "$BUILD_DIR"
-}
-
-# Build for requested architecture or both
-if [ "${1:-}" = "aarch64" ] || [ "${1:-}" = "x86_64" ]; then
-    build_muse_deb "$1"
-else
-    build_muse_deb aarch64
-    build_muse_deb x86_64
-fi
+# Build deb (deterministic: stable bytes for unchanged content)
+DEB_FILE="${DEBS_DIR}/muse-code_${DEB_VERSION}_termux_${ARCH}.deb"
+export REPRO_MTIME
+REPRO_MTIME="$(git -C "$REPO_ROOT" log -1 --format=%ct -- packages/muse-code 2>/dev/null || git -C "$REPO_ROOT" log -1 --format=%ct)"
+bash "$REPO_ROOT/scripts/build-deb.sh" "$PKG_DIR" "$DEB_FILE"
+echo "Built: $DEB_FILE"
+rm -rf "$BUILD_DIR"

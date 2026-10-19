@@ -16,8 +16,8 @@ This document details the architectural analysis, technical challenges, solution
   3. **Third-party Bootstrapper Coupling:** Previous builds relied on `wallentx/antigravity-cli-termux`, which bundled an ARM64-only Bionic binary with hardcoded auto-update network calls.
 - **Implemented Solutions:**
   - **`helper/patch_va39.py`:** Standalone Python script that disassembles 32-bit ARM64 machine instructions and patches page alignment bitmasks, mmap parameters, and redirects `faccessat2` $\to$ `faccessat`.
-  - **Architecture Branching:** `patch_va39.py` is applied exclusively to `aarch64`. On `x86_64`, standard 48-bit address space exists natively and the official binary is packaged unpatched.
-  - **Decoupled POSIX Launcher (`helper/agy.sh`):** A clean shell script that unsets Bionic `LD_PRELOAD`, sets `GODEBUG="netdns=cgo"`, points `SSL_CERT_FILE` to Termux certificates, and dynamically resolves the appropriate glibc loader (`ld-linux-aarch64.so.1` or `ld-linux-x86-64.so.2`).
+  - **Architecture Branching:** `patch_va39.py` is applied to the `aarch64` binary — the only architecture this repository builds (x86_64 users use the official Google build directly).
+  - **Decoupled POSIX Launcher (`helper/agy.sh`):** A clean shell script that unsets Bionic `LD_PRELOAD`, sets `GODEBUG="netdns=cgo"`, points `SSL_CERT_FILE` to Termux certificates, and resolves the glibc loader (`ld-linux-aarch64.so.1`).
   - **Dependencies:** `glibc-repo`, `glibc`, `resolv-conf`, `ca-certificates`.
 
 ---
@@ -76,7 +76,7 @@ This document details the architectural analysis, technical challenges, solution
 ### `muse-code`
 - **Description:** Meta's terminal AI coding agent powered by Muse Spark.
 - **Upstream:** Meta CDN.
-- **Binary Format:** Prebuilt Linux executable (`aarch64` and `x86_64`).
+- **Binary Format:** Prebuilt Linux executable (`aarch64`).
 - **Android / Termux Hurdles:**
   - Relies on glibc and specific syscall behavior.
 - **Implemented Solutions:**
@@ -154,7 +154,7 @@ This document details the architectural analysis, technical challenges, solution
 - **What It Is:** Python binding bundling patched curl + BoringSSL to impersonate browser TLS fingerprints. A library, not a CLI — end-user value comes through dependents, chiefly `yt-dlp --impersonate` (unlocks Cloudflare-protected pages) and scrapers facing bot checks.
 - **Wheel Coverage (verified 2026-09-23):** v0.16.3 ships Android wheels for **cp310 through cp314** (all three ABIs each), so the current Termux Python 3.14 is covered (`cp314-cp314-android_21_arm64_v8a`). Note the Android wheels are version-locked per CPython (unlike the `abi3` manylinux/macOS ones), so each Termux Python bump needs the matching builder target to exist — worth a CI check that keeps matrix and Termux in step.
 - **Packaging Plan:**
-  - Unlike the npm `all`-arch packages, this must be **arch-specific**: `postinst` pip-installs the per-arch wheel URL from the builder releases (`arm64_v8a` on `aarch64`, `x86_64` on `x86_64`).
+  - Unlike the npm `all`-arch packages, this must be **arch-specific**: `postinst` pip-installs the per-arch wheel URL from the builder releases (`arm64_v8a` on `aarch64`, `x86_64` on `x86_64` — the `curl-cffi` deb itself is `Architecture: all`, so the wheel is picked at install time).
   - `Depends: python`; version pin must track builder releases, not PyPI.
   - Natural companion to a future `yt-dlp` package (its `--impersonate` flag lights up only when `curl_cffi` is importable).
 

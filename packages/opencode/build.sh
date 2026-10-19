@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # opencode v2: upstream glibc binary + exec-spawn preload shim, no proot
-# Usage: build.sh [aarch64|x86_64]
+# Builds the aarch64 deb.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -12,13 +12,8 @@ mkdir -p "$DEBS_DIR"
 VERSION="${OPENCODE_VERSION:-2.0.32}"
 DEB_VERSION="${VERSION}-1"
 PREFIX="data/data/com.termux/files/usr"
-ARCH="${1:-aarch64}"
-
-case "$ARCH" in
-    aarch64) UPSTREAM_ARCH="arm64" ;;
-    x86_64)  UPSTREAM_ARCH="x64" ;;
-    *) echo "Usage: $0 [aarch64|x86_64]" >&2; exit 1 ;;
-esac
+ARCH="aarch64"
+UPSTREAM_ARCH="arm64"
 
 echo "=== Building opencode ${DEB_VERSION} (${ARCH}) ==="
 
@@ -53,15 +48,11 @@ install -Dm755 "$UPSTREAM_BIN" "${PKG_DIR}/${PREFIX}/lib/opencode/opencode-bin"
 # Build the exec-spawn preload shim with a glibc-targeting compiler.
 # Must NOT be Termux's bionic gcc: the shim loads into the glibc process.
 find_glibc_cc() {
-    if [ "$ARCH" = "aarch64" ]; then
-        for c in "${CC:-aarch64-linux-gnu-gcc}" \
-                 "${TERMUX_PREFIX:-/data/data/com.termux/files/usr}/glibc/bin/aarch64-linux-gnu-gcc" \
-                 "${TERMUX_PREFIX:-/data/data/com.termux/files/usr}/glibc/bin/aarch64-linux-gnu-gcc-14.2.1"; do
-            if command -v "$c" >/dev/null 2>&1; then echo "$c"; return 0; fi
-        done
-    else
-        if command -v "${CC:-gcc}" >/dev/null 2>&1; then echo "${CC:-gcc}"; return 0; fi
-    fi
+    for c in "${CC:-aarch64-linux-gnu-gcc}" \
+             "${TERMUX_PREFIX:-/data/data/com.termux/files/usr}/glibc/bin/aarch64-linux-gnu-gcc" \
+             "${TERMUX_PREFIX:-/data/data/com.termux/files/usr}/glibc/bin/aarch64-linux-gnu-gcc-14.2.1"; do
+        if command -v "$c" >/dev/null 2>&1; then echo "$c"; return 0; fi
+    done
     return 1
 }
 

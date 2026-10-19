@@ -25,8 +25,6 @@ if [ -x "${GLIBC_DIR}/bin/ld.so" ]; then
     LD_LOADER="${GLIBC_DIR}/bin/ld.so"
 elif [ -f "${GLIBC_DIR}/lib/ld-linux-aarch64.so.1" ]; then
     LD_LOADER="${GLIBC_DIR}/lib/ld-linux-aarch64.so.1"
-elif [ -f "${GLIBC_DIR}/lib/ld-linux-x86-64.so.2" ]; then
-    LD_LOADER="${GLIBC_DIR}/lib/ld-linux-x86-64.so.2"
 else
     echo "Error: glibc loader not found. Install glibc with: pkg install glibc" >&2
     exit 1

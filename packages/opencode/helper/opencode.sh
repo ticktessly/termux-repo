@@ -17,11 +17,7 @@ PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 LIBDIR="${PREFIX}/lib/opencode"
 REAL_BIN="${LIBDIR}/opencode-bin"
 
-if [ "$(uname -m)" = "x86_64" ]; then
-    LD_LOADER="${PREFIX}/glibc/lib/ld-linux-x86-64.so.2"
-else
-    LD_LOADER="${PREFIX}/glibc/lib/ld-linux-aarch64.so.1"
-fi
+LD_LOADER="${PREFIX}/glibc/lib/ld-linux-aarch64.so.1"
 
 export OPENCODE_BIN="${REAL_BIN}"
 export LD_PRELOAD="${LIBDIR}/execshim.so"

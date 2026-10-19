@@ -3,8 +3,7 @@ set -euo pipefail
 
 # antigravity-cli: Google's AI coding agent for Termux
 # Uses glibc dynamic loader + official Google binary
-# Supports both aarch64 and x86_64
-# Usage: build.sh [aarch64|x86_64]
+# Builds the aarch64 deb.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -12,14 +11,8 @@ DEBS_DIR="$REPO_ROOT/debs"
 mkdir -p "$DEBS_DIR"
 
 build_antigravity_deb() {
-    local ARCH="$1"
-    local AGY_ARCH
-
-    case "$ARCH" in
-        aarch64) AGY_ARCH="arm64" ;;
-        x86_64)  AGY_ARCH="amd64" ;;
-        *) echo "Usage: $0 [aarch64|x86_64]" >&2; exit 1 ;;
-    esac
+    local ARCH="aarch64"
+    local AGY_ARCH="arm64"
 
     echo "=== Building antigravity-cli (${ARCH}) ==="
 
@@ -72,16 +65,10 @@ build_antigravity_deb() {
 
     # Step 3: Install binary
     # On aarch64 Android, apply VA39 patch for 39-bit virtual addressing
-    # On x86_64, standard 48-bit VA applies and the official binary runs directly
-    if [ "$ARCH" = "aarch64" ]; then
-        echo "Applying VA39 patch for aarch64 Android..."
-        local PATCHED="${BUILD_DIR}/agy_patched"
-        python3 "$SCRIPT_DIR/helper/patch_va39.py" "$GOOGLE_BIN" "$PATCHED"
-        install -Dm755 "$PATCHED" "${LIB_DIR}/agy.bin"
-    else
-        echo "Installing unpatched Google binary for x86_64..."
-        install -Dm755 "$GOOGLE_BIN" "${LIB_DIR}/agy.bin"
-    fi
+    echo "Applying VA39 patch for aarch64 Android..."
+    local PATCHED="${BUILD_DIR}/agy_patched"
+    python3 "$SCRIPT_DIR/helper/patch_va39.py" "$GOOGLE_BIN" "$PATCHED"
+    install -Dm755 "$PATCHED" "${LIB_DIR}/agy.bin"
 
     # Compatibility symlinks inside LIB_DIR
     ln -sf agy.bin "${LIB_DIR}/agy.va39"
@@ -119,9 +106,4 @@ EOF
     rm -rf "$BUILD_DIR"
 }
 
-if [ "${1:-}" = "aarch64" ] || [ "${1:-}" = "x86_64" ]; then
-    build_antigravity_deb "$1"
-else
-    build_antigravity_deb aarch64
-    build_antigravity_deb x86_64
-fi
+build_antigravity_deb

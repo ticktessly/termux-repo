@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # oh-my-pi: Glibc-linked binary with C bootstrapper
-# Usage: build.sh [aarch64|x86_64]
+# Builds the aarch64 deb.
 # Strategy: deb contains only the tiny C bootstrapper + postinst downloads the large binary
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -14,13 +14,8 @@ VERSION="${OMP_VERSION:-18.12.2}"
 PKGREL="${OMP_PKGREL:-1}"
 DEB_VERSION="${VERSION}-${PKGREL}"
 PREFIX="data/data/com.termux/files/usr"
-ARCH="${1:-aarch64}"
-
-case "$ARCH" in
-    aarch64) CC="aarch64-linux-gnu-gcc"; OMP_ARCH="arm64" ;;
-    x86_64)  CC="gcc";                   OMP_ARCH="x64" ;;
-    *) echo "Usage: $0 [aarch64|x86_64]" >&2; exit 1 ;;
-esac
+ARCH="aarch64"
+OMP_ARCH="arm64"
 
 echo "=== Building oh-my-pi ${DEB_VERSION} (${ARCH}) ==="
 
@@ -63,7 +58,6 @@ if [ ! -f "$BIN_FILE" ] || [ "$CACHED_VER" != "$VERSION" ]; then
     ARCH=$(dpkg --print-architecture)
     case "$ARCH" in
         aarch64) OMP_ARCH="arm64" ;;
-        amd64)   OMP_ARCH="x64" ;;
         *) echo "Unsupported architecture: $ARCH" >&2; exit 1 ;;
     esac
     URL="https://github.com/can1357/oh-my-pi/releases/download/v${VERSION}/omp-linux-${OMP_ARCH}"

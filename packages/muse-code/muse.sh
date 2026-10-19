@@ -69,15 +69,4 @@ if [[ -n "${TERMUX_VERSION:-}" || -d "/data/data/com.termux" ]]; then
   fi
 fi
 
-# AVX2 fallback on x86_64
-if [[ "$(uname -m)" == "x86_64" ]] && ! grep -q -m1 "avx2" /proc/cpuinfo 2>/dev/null; then
-  if command -v qemu-x86_64 >/dev/null 2>&1; then
-    exec qemu-x86_64 -cpu max "$REAL_BIN" "$@"
-  else
-    printf 'Error: Your CPU does not support AVX2 instructions required by Muse.\n' >&2
-    printf 'Install qemu-user-x86-64: pkg install qemu-user-x86-64\n' >&2
-    exit 1
-  fi
-else
-  exec "$REAL_BIN" "$@"
-fi
+exec "$REAL_BIN" "$@"

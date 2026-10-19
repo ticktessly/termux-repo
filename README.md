@@ -13,11 +13,14 @@ curl -sL https://ticktessly.github.io/termux-repo/install.sh | bash
 | Package | Description | Arch |
 |---------|-------------|------|
 | `curl-cffi` | Browser TLS impersonation for Python (yt-dlp --impersonate) | all |
-| `muse-code` | Meta's Muse Code AI agent with session/MCP tools | aarch64, x86_64 |
-| `opencode` | AI-powered coding assistant (v2, no proot) | aarch64, x86_64 |
-| `antigravity-cli` | Google Antigravity CLI | aarch64, x86_64 |
-| `oh-my-pi` | Oh-My-Pi plugin manager for Pi | aarch64, x86_64 |
-| `copilot-cli` | GitHub Copilot CLI (unofficial, glibc bridge, no proot) | aarch64, x86_64 |
+| `muse-code` | Meta's Muse Code AI agent with session/MCP tools | aarch64 |
+| `opencode` | AI-powered coding assistant (v2, no proot) | aarch64 |
+| `antigravity-cli` | Google Antigravity CLI | aarch64 |
+| `oh-my-pi` | Oh-My-Pi plugin manager for Pi | aarch64 |
+| `copilot-cli` | GitHub Copilot CLI (unofficial, glibc bridge, no proot) | aarch64 |
+
+This repository builds **aarch64** packages only. x86_64 devices can use the
+upstream builds of these tools directly, so no x86_64 debs are published here.
 
 ## Documentation & Guides
 
@@ -71,7 +74,7 @@ with `opencode service stop` (or `pkill -f 'opencode.*serve'`).
 
 - **opencode** (v2), **antigravity-cli**, and **oh-my-pi** require `glibc-repo` and `glibc`. Install with `pkg install glibc-repo`.
 - **copilot-cli** (unofficial GitHub Copilot CLI port) also requires `glibc-repo`/`glibc`. It downloads the official ~180 MB glibc binary from GitHub releases and checksum-verifies it at install time (it is not redistributed). Self-update is disabled; authenticate with `COPILOT_GITHUB_TOKEN` or `copilot login --device-code`.
-- **muse-code** requires `proot` for syscall emulation. On x86_64 devices without AVX2, `qemu-user-x86-64` is suggested for muse-code.
+- **muse-code** requires `proot` for syscall emulation.
 
 ## Adding Packages
 

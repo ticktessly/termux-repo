@@ -8,10 +8,6 @@ PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 REAL_BIN="${PREFIX}/lib/oh-my-pi/omp.bin"
 LD_LOADER="${PREFIX}/glibc/lib/ld-linux-aarch64.so.1"
 
-if [ "$(uname -m)" = "x86_64" ]; then
-    LD_LOADER="${PREFIX}/glibc/lib/ld-linux-x86-64.so.2"
-fi
-
 export SSL_CERT_FILE="${SSL_CERT_FILE:-${PREFIX}/etc/tls/cert.pem}"
 export TMPDIR="${TMPDIR:-${PREFIX}/tmp}"
 

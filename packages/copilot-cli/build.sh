@@ -8,7 +8,7 @@ set -euo pipefail
 # never redistribute upstream's proprietary binary (see helper/README.md). The
 # binary runs on Termux's glibc bridge (glibc-repo); no proot is required.
 #
-# Usage: build.sh [aarch64|x86_64]
+# Builds the aarch64 deb.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -18,13 +18,8 @@ mkdir -p "$DEBS_DIR"
 VERSION="${COPILOT_CLI_VERSION:-$(cat "$SCRIPT_DIR/VERSION")}"
 DEB_VERSION="${VERSION}-1"
 PREFIX="data/data/com.termux/files/usr"
-ARCH="${1:-aarch64}"
-
-case "$ARCH" in
-    aarch64) UP_ARCH="arm64" ;;
-    x86_64)  UP_ARCH="x64" ;;
-    *) echo "Usage: $0 [aarch64|x86_64]" >&2; exit 1 ;;
-esac
+ARCH="aarch64"
+UP_ARCH="arm64"
 
 echo "=== Building copilot-cli ${DEB_VERSION} (${ARCH}) ==="
 
@@ -76,8 +71,7 @@ UP_VER="${DEB_VER%-*}"
 
 ARCH="$(dpkg --print-architecture)"
 case "$ARCH" in
-    aarch64)      UP_ARCH="arm64"; LOADER="ld-linux-aarch64.so.1" ;;
-    x86_64|amd64) UP_ARCH="x64";   LOADER="ld-linux-x86-64.so.2" ;;
+    aarch64) UP_ARCH="arm64"; LOADER="ld-linux-aarch64.so.1" ;;
     *) echo "copilot-cli: unsupported architecture: $ARCH" >&2; exit 1 ;;
 esac
 

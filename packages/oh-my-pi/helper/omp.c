@@ -12,9 +12,7 @@
 #include <limits.h>
 #include <stdio.h>
 
-#if defined(__x86_64__)
-#define LD_LOADER "/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-#elif defined(__aarch64__)
+#if defined(__aarch64__)
 #define LD_LOADER "/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
 #else
 #error "Unsupported architecture"

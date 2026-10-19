@@ -176,6 +176,5 @@ if [ -n "$MUSE_REALVER" ]; then
 fi
 MUSE_MANIFEST="$(http_get "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=${MUSE_REALVER}&file=manifest.json" || true)"
 export_var MUSE_SHA256_AARCH64 "$(printf '%s' "$MUSE_MANIFEST" | python3 -c 'import json,sys;print(json.load(sys.stdin)["artifacts"]["aarch64_linux"]["checksum"])' || true)"
-export_var MUSE_SHA256_X86_64  "$(printf '%s' "$MUSE_MANIFEST" | python3 -c 'import json,sys;print(json.load(sys.stdin)["artifacts"]["x86_linux"]["checksum"])' || true)"
 
 echo "=== Done ==="
