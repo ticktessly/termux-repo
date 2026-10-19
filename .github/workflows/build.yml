@@ -31,14 +31,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y dpkg-dev gcc-aarch64-linux-gnu upx-ucl git perl python3 pkg-config
-
-      - name: Create output directory
-        run: mkdir -p debs
-
       # --- Resolve upstream versions for every package ---
       # Queries each package's source (npm/PyPI/GitHub releases/Meta's
       # channel manifest) for its latest version and exports env vars the
@@ -47,31 +39,99 @@ jobs:
       - name: Resolve upstream versions
         run: bash scripts/resolve-versions.sh "$GITHUB_ENV"
 
+      # Compare resolved upstream versions with the versions in the published
+      # repository. A weekly run with no upstream changes stops here.
+      - name: Check for upstream version changes
+        id: version-check
+        run: |
+          git fetch origin gh-pages --depth=1 2>/dev/null || true
+          python3 - <<'PY'
+          import os
+          import subprocess
+
+          expected = {
+              "curl-cffi": f"{os.environ.get('CURL_CFFI_VERSION', '')}-1",
+              "muse-code": f"{os.environ.get('MUSE_PKGVER', '')}-1",
+              "opencode": f"{os.environ.get('OPENCODE_VERSION', '')}-1",
+              "antigravity-cli": f"{os.environ.get('AGY_VERSION', '')}-1",
+              "oh-my-pi": f"{os.environ.get('OMP_VERSION', '')}-1",
+              "copilot-cli": f"{os.environ.get('COPILOT_CLI_VERSION', '')}-1",
+          }
+          try:
+              packages = subprocess.check_output(
+                  ["git", "show", "origin/gh-pages:dists/stable/main/binary-aarch64/Packages"],
+                  text=True,
+              )
+          except subprocess.CalledProcessError:
+              packages = ""
+
+          current = {}
+          for stanza in packages.split("\n\n"):
+              fields = dict(
+                  line.split(": ", 1)
+                  for line in stanza.splitlines()
+                  if ": " in line
+              )
+              if "Package" in fields and "Version" in fields:
+                  current[fields["Package"]] = fields["Version"]
+
+          changed = not packages or any(
+              not version or current.get(package) != version
+              for package, version in expected.items()
+          )
+          print("Published versions:", current or "(none)")
+          print("Resolved versions:", expected)
+          print(f"Version changes detected: {changed}")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write(f"build={'true' if changed else 'false'}\n")
+          PY
+
+      - name: Skip build when versions are unchanged
+        if: steps.version-check.outputs.build == 'false'
+        run: echo "All published packages already match the latest upstream versions."
+
+      - name: Install dependencies
+        if: steps.version-check.outputs.build == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev gcc-aarch64-linux-gnu upx-ucl git perl python3 pkg-config
+
+      - name: Create output directory
+        if: steps.version-check.outputs.build == 'true'
+        run: mkdir -p debs
+
       # --- curl-cffi (pip wrapper, arch detected at install time) ---
       - name: Build curl-cffi
+        if: steps.version-check.outputs.build == 'true'
         run: bash scripts/build-deb.sh packages/curl-cffi debs/
 
       # --- muse-code ---
       - name: Build muse-code (aarch64)
+        if: steps.version-check.outputs.build == 'true'
         run: bash packages/muse-code/build.sh
 
       # --- opencode (glibc) ---
       - name: Build opencode (aarch64)
+        if: steps.version-check.outputs.build == 'true'
         run: bash packages/opencode/build.sh
 
       # --- antigravity-cli (glibc) ---
       - name: Build antigravity-cli (aarch64)
+        if: steps.version-check.outputs.build == 'true'
         run: bash packages/antigravity-cli/build.sh
 
       # --- oh-my-pi (glibc) ---
       - name: Build oh-my-pi (aarch64)
+        if: steps.version-check.outputs.build == 'true'
         run: bash packages/oh-my-pi/build.sh
 
       # --- copilot-cli (glibc wrapper) ---
       - name: Build copilot-cli (aarch64)
+        if: steps.version-check.outputs.build == 'true'
         run: bash packages/copilot-cli/build.sh
 
       - name: Compress large debs with upx if needed
+        if: steps.version-check.outputs.build == 'true'
         run: |
           for deb in debs/*.deb; do
             size=$(stat -c%s "$deb")
@@ -95,12 +155,15 @@ jobs:
           done
 
       - name: List built packages
+        if: steps.version-check.outputs.build == 'true'
         run: ls -lh debs/
 
       - name: Generate APT repository
+        if: steps.version-check.outputs.build == 'true'
         run: bash scripts/generate-repo.sh
 
       - name: Deploy to gh-pages
+        if: steps.version-check.outputs.build == 'true'
         run: |
           set -e
 

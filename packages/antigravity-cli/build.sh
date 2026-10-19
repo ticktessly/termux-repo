@@ -23,11 +23,13 @@ build_antigravity_deb() {
     echo "Querying latest version from Google for ${AGY_ARCH}..."
     local MANIFEST_URL="https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_${AGY_ARCH}.json"
     local manifest_json
-    manifest_json="$(curl -fsSL "$MANIFEST_URL")"
-    local VERSION
-    VERSION="$(echo "$manifest_json" | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
-    local DOWNLOAD_URL
-    DOWNLOAD_URL="$(echo "$manifest_json" | sed -n 's/.*"url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+    local VERSION="${AGY_VERSION:-}"
+    local DOWNLOAD_URL="${AGY_DOWNLOAD_URL:-}"
+    if [ -z "$VERSION" ] || [ -z "$DOWNLOAD_URL" ]; then
+        manifest_json="$(curl -fsSL "$MANIFEST_URL")"
+        VERSION="$(echo "$manifest_json" | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+        DOWNLOAD_URL="$(echo "$manifest_json" | sed -n 's/.*"url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+    fi
 
     if [ -z "$VERSION" ] || [ -z "$DOWNLOAD_URL" ]; then
         echo "Error: could not parse manifest" >&2

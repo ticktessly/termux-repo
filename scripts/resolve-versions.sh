@@ -167,6 +167,13 @@ export_var OMP_VERSION "$(latest_release can1357/oh-my-pi)"
 # --- copilot-cli: latest release of github/copilot-cli ---
 export_var COPILOT_CLI_VERSION "$(latest_release github/copilot-cli)"
 
+# --- antigravity-cli: Google's auto-updater manifest ---
+AGY_MANIFEST="$(http_get "https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_arm64.json" || true)"
+AGY_REALVER="$(printf '%s' "$AGY_MANIFEST" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("version",""))' || true)"
+AGY_URL="$(printf '%s' "$AGY_MANIFEST" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("url",""))' || true)"
+export_var AGY_VERSION "$AGY_REALVER"
+export_var AGY_DOWNLOAD_URL "$AGY_URL"
+
 # --- muse-code: Meta's channel manifest gives version AND sha256 sums ---
 MUSE_DOC="$(http_get https://api.meta.ai/muse-code/channels/muse-stable || true)"
 MUSE_REALVER="$(printf '%s' "$MUSE_DOC" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("version",""))' || true)"
