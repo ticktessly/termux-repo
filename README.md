@@ -91,8 +91,10 @@ before building (`scripts/resolve-versions.sh`): PyPI (curl-cffi), GitHub
 releases (oh-my-pi, copilot-cli, curl-cffi wheels),
 Meta's Muse channel manifest (version + sha256), and an upward probe
 of the opencode.ai CDN (no version feed is published for opencode v2).
-The resolved versions are stamped into each package, so `apt upgrade`
-always picks up the newest corners of every tool.
+The resolved versions are compared with the published `gh-pages` package
+index first; if none changed, the build and deployment are skipped. Otherwise,
+the versions are stamped into each package so `apt upgrade` picks up the
+newest release of every tool.
 
 ## Uninstall
 
