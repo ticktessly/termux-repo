@@ -116,6 +116,42 @@ jobs:
         if: steps.version-check.outputs.build == 'true'
         run: mkdir -p debs
 
+      # The published repository is the source of truth for every package
+      # that was not rebuilt in this run. Builds are gated per package on the
+      # upstream version, so a run that only rebuilds two packages would
+      # otherwise regenerate the repository from those two packages alone and
+      # the deploy would drop the rest from the published repo.
+      - name: Restore previously published packages
+        if: steps.version-check.outputs.build == 'true'
+        run: |
+          git fetch origin gh-pages --depth=1 2>/dev/null || true
+          if git rev-parse --verify origin/gh-pages >/dev/null 2>&1; then
+            git archive origin/gh-pages dists 2>/dev/null | tar -x 2>/dev/null || true
+            git archive origin/gh-pages pool 2>/dev/null | tar -x 2>/dev/null || true
+          fi
+
+          # Drop published packages that are no longer part of this
+          # repository, so carrying the published state over cannot
+          # resurrect a package that was intentionally removed. The prune is
+          # skipped when no package definitions are found, so a broken
+          # checkout can never wipe the published repository.
+          known_count=0
+          if [ -d packages ]; then
+            known_count=$(find packages -mindepth 1 -maxdepth 1 -type d | wc -l)
+          fi
+          if [ "$known_count" -eq 0 ]; then
+            echo "No package definitions found; skipping the prune."
+          else
+            for deb in pool/main/*.deb dists/stable/main/binary-*/*.deb; do
+              [ -f "$deb" ] || continue
+              pkg=$(dpkg-deb -f "$deb" Package)
+              if [ ! -d "packages/${pkg}" ]; then
+                echo "Pruning published package no longer in this repository: ${pkg}"
+                rm -f "$deb"
+              fi
+            done
+          fi
+
       # --- curl-cffi (pip wrapper, arch detected at install time) ---
       - name: Build curl-cffi
         if: steps.version-check.outputs.build_curl_cffi == 'true'
@@ -190,7 +226,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Save scripts + new repo content
+          # Collect everything that should be published.
           mkdir -p /tmp/deploy
           cp install.sh uninstall.sh /tmp/deploy/
           cp -r dists pool /tmp/deploy/
@@ -199,27 +235,25 @@ jobs:
           cp README.md DNS_FORWARDING.md PACKAGE_RESEARCH.md /tmp/deploy/ 2>/dev/null || true
           touch /tmp/deploy/.nojekyll
 
-          # Clean working tree before switching branches
-          git checkout -- . 2>/dev/null || true
-          git clean -fd 2>/dev/null || true
-
-          if git fetch origin gh-pages --depth=1 2>/dev/null; then
-            git checkout gh-pages
+          # Start from the published branch with a clean worktree. The
+          # published tree is replaced wholesale by /tmp/deploy below, so
+          # nothing that is not in /tmp/deploy survives the deploy.
+          git fetch origin gh-pages --depth=1 2>/dev/null || true
+          git reset --hard HEAD
+          git clean -fdx
+          if git rev-parse --verify origin/gh-pages >/dev/null 2>&1; then
+            git checkout -B gh-pages origin/gh-pages
           else
             git checkout --orphan gh-pages
-            git rm -rf . 2>/dev/null || true
-            touch .nojekyll
-            git add .nojekyll
-            git commit -m "Init gh-pages"
-            git push origin gh-pages
           fi
-
           git rm -rf . 2>/dev/null || true
-          cp -r /tmp/deploy/* .
-          cp /tmp/deploy/.nojekyll .
+          git clean -fdx
 
-          git add .nojekyll install.sh uninstall.sh index.html dists/ pool/
-          git add README.md DNS_FORWARDING.md PACKAGE_RESEARCH.md 2>/dev/null || true
+          cp -r /tmp/deploy/. .
+
+          # -f: the .deb files in pool/ are ignored by the main branch's
+          # .gitignore, but they have to be published.
+          git add -A -f .
           git commit -m "Deploy $(date -u +%Y-%m-%d)" || true
           git push origin gh-pages
 

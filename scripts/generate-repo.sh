@@ -11,9 +11,32 @@ DEBS_DIR="${REPO_DIR}/debs"
 cd "$REPO_DIR"
 mkdir -p "dists/${DIST}/${COMP}" "pool/${COMP}"
 
-# Copy debs into pool + arch dirs
+# Copy debs into pool + arch dirs.
+#
+# The pool may already hold an older build of the same package: CI rebuilds
+# a package only when its upstream version changed, so the published state
+# of the unchanged packages is carried over from the previous deployment.
+# Those superseded files are removed first, otherwise the regenerated
+# Packages file would list two versions of the same package.
 for deb in "$DEBS_DIR"/*.deb; do
+    [ -f "$deb" ] || continue
+    pkg=$(dpkg-deb -f "$deb" Package)
     arch=$(dpkg-deb -f "$deb" Architecture)
+    deb_name=$(basename "$deb")
+
+    for old in "pool/${COMP}"/"${pkg}"_*.deb; do
+        [ -f "$old" ] || continue
+        if [ "$old" != "pool/${COMP}/${deb_name}" ]; then
+            rm -f "$old"
+        fi
+    done
+    for old in "dists/${DIST}/${COMP}"/binary-*/"${pkg}"_*.deb; do
+        [ -f "$old" ] || continue
+        if [ "$old" != "dists/${DIST}/${COMP}/binary-${arch}/${deb_name}" ]; then
+            rm -f "$old"
+        fi
+    done
+
     mkdir -p "dists/${DIST}/${COMP}/binary-${arch}"
     cp "$deb" "dists/${DIST}/${COMP}/binary-${arch}/"
     cp "$deb" "pool/${COMP}/"
