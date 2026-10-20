@@ -179,6 +179,7 @@ jobs:
         run: bash scripts/generate-repo.sh
 
       - name: Generate landing page
+        if: steps.version-check.outputs.build == 'true'
         run: bash scripts/generate-index.sh
 
       - name: Deploy to gh-pages
