@@ -16,6 +16,64 @@ MD5sum: 0256d31e2516dc258de10d08f200c731
 SHA1: 9d18289c83b64106769beefbcf3faed9a796a7a2
 SHA256: a9ad0e60ed597d2b2ef9e256716b238d6a4588838ed1d20cbbaf689041c4439b
 
+Package: copilot-cli
+Version: 1.0.100-1
+Architecture: aarch64
+Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
+Installed-Size: 8
+Depends: glibc-repo, glibc, gcc-libs-glibc, patchelf, ripgrep, git, bash, curl, ca-certificates
+Section: devel
+Priority: optional
+Homepage: https://github.com/github/copilot-cli
+Description: GitHub Copilot CLI (unofficial Termux port)
+ Agentic coding assistant for the terminal. Unofficial; not affiliated with
+ or endorsed by GitHub. Runs on the Termux glibc bridge (no proot). Requires
+ an active Copilot subscription. The ~180 MB upstream binary is downloaded
+ and checksum-verified at install time. Authenticate with COPILOT_GITHUB_TOKEN
+ or 'copilot login --device-code'.
+Filename: pool/main/copilot-cli_1.0.100-1_termux_aarch64.deb
+Size: 4988
+MD5sum: 6f4f12d58b305a68eb8458d5450fd404
+SHA1: d6ae4f471b0c10fc114f2d6c4ad26fdd7f32a157
+SHA256: 2799a7d2159dae16b6ac387c968f6be894c4da3e24ff23021e6e751f720a151a
+
+Package: muse-code
+Version: 1.4.11.r6667.1-1
+Architecture: aarch64
+Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
+Installed-Size: 337926
+Depends: python, ca-certificates, proot
+Section: devel
+Priority: optional
+Homepage: https://dev.meta.ai
+Description: Terminal-based AI coding agent powered by Meta's Muse Spark
+ Packed with an interactive curses TUI session picker,
+ and multi-agent MCP configuration management.
+Filename: pool/main/muse-code_1.4.11.r6667.1-1_termux_aarch64.deb
+Size: 70828996
+MD5sum: b88a4f43be46b22efc81ff7674fda282
+SHA1: 0e1cbe66916d874cd4861114c5d8cc9aebb24ef7
+SHA256: 7f7105bb390bd1d50d98c7340609fc3cfad6aed667b69fb60036d72004982528
+
+Package: oh-my-pi
+Version: 18.12.3-1
+Architecture: aarch64
+Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
+Installed-Size: 2
+Depends: glibc-repo, glibc, proot, curl
+Section: devel
+Priority: optional
+Homepage: https://omp.sh
+Description: Oh-My-Pi - a coding agent with the IDE wired in
+ Plugin manager for Pi - think oh-my-zsh but for Pi. Install themes,
+ agents, commands, and tools with a single command. Uses glibc bridge
+ for Termux compatibility. Binary downloaded on first run.
+Filename: pool/main/oh-my-pi_18.12.3-1_termux_aarch64.deb
+Size: 2080
+MD5sum: 8786f7879e6e58b350cb30b75ccf1d68
+SHA1: 79c3b3c641ceed5f55241a5a8f80229f1fcadbc4
+SHA256: be0c993f9c512179d35126b927d0241208dc6f823653bd4491847168a03a8407
+
 Package: opencode
 Version: 2.1.0-1
 Architecture: aarch64
