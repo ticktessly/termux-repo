@@ -2,6 +2,7 @@ debs/
 *.deb
 build/
 dist/
+site/
 *.o
 *.tar.gz
 *.tar.xz

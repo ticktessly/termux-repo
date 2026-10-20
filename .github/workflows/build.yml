@@ -178,6 +178,9 @@ jobs:
         if: steps.version-check.outputs.build == 'true'
         run: bash scripts/generate-repo.sh
 
+      - name: Generate landing page
+        run: bash scripts/generate-index.sh
+
       - name: Deploy to gh-pages
         if: steps.version-check.outputs.build == 'true'
         run: |
@@ -190,6 +193,9 @@ jobs:
           mkdir -p /tmp/deploy
           cp install.sh uninstall.sh /tmp/deploy/
           cp -r dists pool /tmp/deploy/
+          # Landing page (generated from the Packages files) and the guides.
+          cp site/index.html /tmp/deploy/
+          cp README.md DNS_FORWARDING.md PACKAGE_RESEARCH.md /tmp/deploy/ 2>/dev/null || true
           touch /tmp/deploy/.nojekyll
 
           # Clean working tree before switching branches
@@ -211,7 +217,8 @@ jobs:
           cp -r /tmp/deploy/* .
           cp /tmp/deploy/.nojekyll .
 
-          git add .nojekyll install.sh uninstall.sh dists/ pool/
+          git add .nojekyll install.sh uninstall.sh index.html dists/ pool/
+          git add README.md DNS_FORWARDING.md PACKAGE_RESEARCH.md 2>/dev/null || true
           git commit -m "Deploy $(date -u +%Y-%m-%d)" || true
           git push origin gh-pages
 
