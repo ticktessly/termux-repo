@@ -1,8 +1,8 @@
 Package: antigravity-cli
-Version: 1.4.3-1
+Version: 1.4.7-1
 Architecture: aarch64
 Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
-Installed-Size: 207063
+Installed-Size: 212247
 Depends: glibc-repo, glibc, resolv-conf, ca-certificates
 Section: devel
 Priority: optional
@@ -10,14 +10,14 @@ Homepage: https://antigravity.google/cli
 Description: Google Antigravity CLI - AI coding agent
  Antigravity CLI brings multi-step reasoning, multi-file editing, tool
  calling, and persistent history to your terminal.
-Filename: pool/main/antigravity-cli_1.4.3-1_termux_aarch64.deb
-Size: 41298956
-MD5sum: 0256d31e2516dc258de10d08f200c731
-SHA1: 9d18289c83b64106769beefbcf3faed9a796a7a2
-SHA256: a9ad0e60ed597d2b2ef9e256716b238d6a4588838ed1d20cbbaf689041c4439b
+Filename: pool/main/antigravity-cli_1.4.7-1_termux_aarch64.deb
+Size: 42208012
+MD5sum: 1156f0b473db670f399a129714099807
+SHA1: 04a2e1a9aca492dc911eeb9c5263e2c5423708a0
+SHA256: 5a04bd976c3edb26dcf1b352dda39b0724836d0590b2f93483dfd7a29d1d7a05
 
 Package: copilot-cli
-Version: 1.0.100-1
+Version: 1.0.103-1
 Architecture: aarch64
 Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
 Installed-Size: 8
@@ -31,17 +31,17 @@ Description: GitHub Copilot CLI (unofficial Termux port)
  an active Copilot subscription. The ~180 MB upstream binary is downloaded
  and checksum-verified at install time. Authenticate with COPILOT_GITHUB_TOKEN
  or 'copilot login --device-code'.
-Filename: pool/main/copilot-cli_1.0.100-1_termux_aarch64.deb
+Filename: pool/main/copilot-cli_1.0.103-1_termux_aarch64.deb
 Size: 4988
-MD5sum: 6f4f12d58b305a68eb8458d5450fd404
-SHA1: d6ae4f471b0c10fc114f2d6c4ad26fdd7f32a157
-SHA256: 2799a7d2159dae16b6ac387c968f6be894c4da3e24ff23021e6e751f720a151a
+MD5sum: 16bfb65eaeb7daf7e754c26940645e84
+SHA1: 739934a8eebf5a9766fa56000662133a96ca01a4
+SHA256: d1684d2a78b74b518f00c587ca007455140981cba1877d4062b8d599ef1d3365
 
 Package: muse-code
-Version: 1.4.11.r6667.1-1
+Version: 1.4.13.r6996.1-1
 Architecture: aarch64
 Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
-Installed-Size: 337926
+Installed-Size: 351878
 Depends: python, ca-certificates, proot
 Section: devel
 Priority: optional
@@ -49,14 +49,14 @@ Homepage: https://dev.meta.ai
 Description: Terminal-based AI coding agent powered by Meta's Muse Spark
  Packed with an interactive curses TUI session picker,
  and multi-agent MCP configuration management.
-Filename: pool/main/muse-code_1.4.11.r6667.1-1_termux_aarch64.deb
-Size: 70828996
-MD5sum: b88a4f43be46b22efc81ff7674fda282
-SHA1: 0e1cbe66916d874cd4861114c5d8cc9aebb24ef7
-SHA256: 7f7105bb390bd1d50d98c7340609fc3cfad6aed667b69fb60036d72004982528
+Filename: pool/main/muse-code_1.4.13.r6996.1-1_termux_aarch64.deb
+Size: 72974960
+MD5sum: e0f4f3c2a808e60d4b085dfb9fe2b014
+SHA1: e24fb980df010cf84ee32a915bacfa36c9711f77
+SHA256: 4c7af4a539c47abbd0d72efacb42103a6f815418b468c54959215dc0587ded27
 
 Package: oh-my-pi
-Version: 18.12.3-1
+Version: 18.12.6-1
 Architecture: aarch64
 Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
 Installed-Size: 2
@@ -68,17 +68,17 @@ Description: Oh-My-Pi - a coding agent with the IDE wired in
  Plugin manager for Pi - think oh-my-zsh but for Pi. Install themes,
  agents, commands, and tools with a single command. Uses glibc bridge
  for Termux compatibility. Binary downloaded on first run.
-Filename: pool/main/oh-my-pi_18.12.3-1_termux_aarch64.deb
+Filename: pool/main/oh-my-pi_18.12.6-1_termux_aarch64.deb
 Size: 2080
-MD5sum: 8786f7879e6e58b350cb30b75ccf1d68
-SHA1: 79c3b3c641ceed5f55241a5a8f80229f1fcadbc4
-SHA256: be0c993f9c512179d35126b927d0241208dc6f823653bd4491847168a03a8407
+MD5sum: a28983a2636745dfb15f323b81f02a9b
+SHA1: 35133f3871869c3631ffabdd2de3abeaa7499c62
+SHA256: 5b06f570baad7bd08d0b3659af63515e1cbedc56f614845821996adf6e24ab0c
 
 Package: opencode
-Version: 2.1.0-1
+Version: 2.1.4-1
 Architecture: aarch64
 Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
-Installed-Size: 204347
+Installed-Size: 230651
 Depends: glibc-repo, glibc, ripgrep, jq, nodejs-lts
 Section: devel
 Priority: optional
@@ -86,8 +86,8 @@ Homepage: https://github.com/anomalyco/opencode
 Description: AI-powered coding assistant for the terminal (v2)
  OpenCode is an interactive AI coding assistant that runs in your terminal.
  Runs on the glibc bridge with an exec-spawn shim; no proot required.
-Filename: pool/main/opencode_2.1.0-1_termux_aarch64.deb
-Size: 73824460
-MD5sum: 57c3054bb6827d0c591b316061d63022
-SHA1: 96c8d59cc8d39067718ccb7aa42e2bc4d51c33ae
-SHA256: 87d8132c36fc86a53cbcb386eeeb90cb140d1a0e7987418a2d7bf646c2339d0e
+Filename: pool/main/opencode_2.1.4-1_termux_aarch64.deb
+Size: 83515508
+MD5sum: 4f222efd31a433d9123fb73e817aa8a7
+SHA1: ad7758a5df4d571cb31f35689cbae52fb71a38ca
+SHA256: 24f0dfa4715014a9a38d3dca0b0326f2607f0417dd9d3d8c18bbc50a50f682ae
