@@ -1,5 +1,5 @@
 Package: curl-cffi
-Version: 0.16.3-1
+Version: 0.16.4-1
 Architecture: all
 Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
 Installed-Size: 0
@@ -12,8 +12,8 @@ Description: Browser TLS fingerprint impersonation for Python
  Android. Unlocks yt-dlp --impersonate and bot-aware scraping on Termux.
  Wheels come from curl-cffi-builder releases; the cffi dependency is
  built locally and needs: pkg install clang libffi.
-Filename: pool/main/curl-cffi_0.16.3-1_all.deb
-Size: 1496
-MD5sum: ec019fd900c15232efccdbdf8765a3c4
-SHA1: 5a0cbe3338b5fd98cfd4b8d18f769d3cead397fe
-SHA256: e97f7cf0f54987392100d9ae4a2255eb729d4d4ecb8a3076af3e396fb474c42d
+Filename: pool/main/curl-cffi_0.16.4-1_all.deb
+Size: 1512
+MD5sum: c1996ff148f7cf565b36f7a6d2251127
+SHA1: 20d5655915089f164509892278b4d26b935dc767
+SHA256: ebec9bf5cfdc922affb27eb1b5ccd6d6e4294e790845ec4f83a9bf35ed5b55a3
