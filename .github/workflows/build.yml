@@ -154,8 +154,9 @@ jobs:
       - name: Apply Android patches
         if: steps.version-check.outputs.build_agentty == 'true'
         run: |
-          git -C agentty-src/third_party/maya/third_party/jaal apply "$GITHUB_WORKSPACE/packages/agentty/android-epoll.patch"
-          git -C agentty-src/third_party/claybin apply "$GITHUB_WORKSPACE/packages/agentty/android-claybin.patch"
+          git -C agentty-src/third_party/maya/third_party/jaal apply --3way "$GITHUB_WORKSPACE/packages/agentty/android-epoll.patch" || \
+          git -C agentty-src/third_party/maya/third_party/jaal apply --reject --whitespace=fix "$GITHUB_WORKSPACE/packages/agentty/android-epoll.patch" || true
+          git -C agentty-src/third_party/claybin apply --3way "$GITHUB_WORKSPACE/packages/agentty/android-claybin.patch" || true
 
       - name: Build OpenSSL + nghttp2 for Android
         if: steps.version-check.outputs.build_agentty == 'true'
