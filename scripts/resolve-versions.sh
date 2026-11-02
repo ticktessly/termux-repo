@@ -197,4 +197,5 @@ fi
 MUSE_MANIFEST="$(http_get "https://lookaside.facebook.com/lookaside/muse/download/?channel=muse&version=${MUSE_REALVER}&file=manifest.json" || true)"
 export_var MUSE_SHA256_AARCH64 "$(printf '%s' "$MUSE_MANIFEST" | python3 -c 'import json,sys;print(json.load(sys.stdin)["artifacts"]["aarch64_linux"]["checksum"])' || true)"
 
-echo "=== Done ==="
+# --- agentty: version pinned in packages/agentty/VERSION (no upstream feed) ---
+export_var AGENTTY_VERSION "$(cat packages/agentty/VERSION)"
