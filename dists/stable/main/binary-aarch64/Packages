@@ -43,6 +43,8 @@ Architecture: aarch64
 Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
 Installed-Size: 318386
 Depends: glibc-repo, glibc, ripgrep, git, nodejs-lts, ca-certificates, bash
+Conflicts: kilocode
+Replaces: kilocode
 Section: devel
 Priority: optional
 Homepage: https://github.com/Kilo-Org/kilocode
@@ -100,6 +102,7 @@ Architecture: aarch64
 Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
 Installed-Size: 242684
 Depends: glibc-repo, glibc, ripgrep, jq, nodejs-lts
+Conflicts: opencode-legacy
 Section: devel
 Priority: optional
 Homepage: https://github.com/anomalyco/opencode
