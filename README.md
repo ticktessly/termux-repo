@@ -18,6 +18,7 @@ curl -sL https://ticktessly.github.io/termux-repo/install.sh | bash
 | `antigravity-cli` | Google Antigravity CLI | aarch64 |
 | `oh-my-pi` | Oh-My-Pi plugin manager for Pi | aarch64 |
 | `copilot-cli` | GitHub Copilot CLI (unofficial, glibc bridge, no proot) | aarch64 |
+| `kilo-code` | Kilo Code CLI AI coding agent (glibc bridge, no proot) | aarch64 |
 
 This repository builds **aarch64** packages only. x86_64 devices can use the
 upstream builds of these tools directly, so no x86_64 debs are published here.
@@ -70,10 +71,28 @@ zero `faccessat2` references (opcode scan + dynamic symbols use
 service shuts down with the TUI under normal quit; after a kill, stop leftovers
 with `opencode service stop` (or `pkill -f 'opencode.*serve'`).
 
+## kilo-code packaging notes
+
+`kilo-code` ships the upstream [Kilo Code CLI](https://github.com/Kilo-Org/kilocode)
+(opencode fork, Bun single-executable, MIT-licensed, redistributed) plus its
+`console/`, `tree-sitter/`, `licenses/` assets and sandbox helpers in the deb,
+installed under `$PREFIX/lib/kilo-code/`. like opencode v2, it runs through the
+glibc loader with the same exec-spawn shim approach (`execshim.so` rewrites the
+daemon's `[execPath, "serve", ...]` self-re-exec to `[loader, $KILO_BIN, serve, ...]`;
+no proot). The `kilo`/`kilocode` wrapper unsets Termux's `LD_PRELOAD`/bionic
+preload pointers, exports `KILO_DISABLE_AUTOUPDATE=1` (updates come from APT,
+never `kilo upgrade`) and points `KILO_TREE_SITTER_WASM_DIR`/`KILO_CONSOLE_ASSET_DIR`
+at the packaged assets (Bun can't locate them next to the loader's execPath).
+
+Known caveats: `kilo daemon start` may exceed its internal 10 s startup timeout on
+first run (retry, or set `KILO_NO_DAEMON=1` to use an embedded server); bundled
+`bwrap` sandboxing is not validated on unrooted Android.
+
 ## Notes
 
-- **opencode** (v2), **antigravity-cli**, and **oh-my-pi** require `glibc-repo` and `glibc`. Install with `pkg install glibc-repo`.
-- **copilot-cli** (unofficial GitHub Copilot CLI port) also requires `glibc-repo`/`glibc`. It downloads the official ~180 MB glibc binary from GitHub releases and checksum-verifies it at install time (it is not redistributed). Self-update is disabled; authenticate with `COPILOT_GITHUB_TOKEN` or `copilot login --device-code`.
+- **opencode** (v2), **antigravity-cli**, **oh-my-pi**, and **kilo-code** require `glibc-repo` and `glibc`. Install with `pkg install glibc-repo`.
+- **copilot-cli** also requires `glibc-repo`/`glibc`. It downloads the official ~180 MB glibc binary from GitHub releases and checksum-verifies it at install time (it is not redistributed). Self-update is disabled; authenticate with `COPILOT_GITHUB_TOKEN` or `copilot login --device-code`.
+- **kilo-code** bundles the upstream MIT-licensed binary and assets; updates come from APT (`kilo upgrade` is disabled).
 - **muse-code** requires `proot` for syscall emulation.
 
 ## Adding Packages

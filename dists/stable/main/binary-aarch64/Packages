@@ -37,6 +37,26 @@ MD5sum: a473ce2fa2dadb0813649a00f25a0468
 SHA1: 5125cf2a78cff616f2f9baaa2aaabbfbd0d35889
 SHA256: 6ad2b5fca19df165090fca024ab78fa457c1a5cef53099e720637d37b3ade8cb
 
+Package: kilo-code
+Version: 7.8.18-1
+Architecture: aarch64
+Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
+Installed-Size: 318386
+Depends: glibc-repo, glibc, ripgrep, git, nodejs-lts, ca-certificates, bash
+Section: devel
+Priority: optional
+Homepage: https://github.com/Kilo-Org/kilocode
+Description: Kilo Code CLI - open source AI coding agent for the terminal
+ Kilo Code is an agentic coding assistant available in VS Code, JetBrains,
+ and the CLI. This package runs the upstream glibc binary on Termux's glibc
+ bridge with an exec-spawn shim; no proot required. The binary and its
+ runtime assets are bundled; update via APT, not 'kilo upgrade'.
+Filename: pool/main/kilo-code_7.8.18-1_termux_aarch64.deb
+Size: 54414784
+MD5sum: 798c0fc8991f2dedce33c7280431c298
+SHA1: 02437de6a27260d4b0fb90769326959a22da181a
+SHA256: 8b0b9d707f8196cc23611e1e361d63ff0b619e87274b88889c35e8fba27b7f0d
+
 Package: muse-code
 Version: 1.4.14.r7309.1-1
 Architecture: aarch64
@@ -56,7 +76,7 @@ SHA1: 32ee388c2212a440d211d58f1fa3168d63f0c6b4
 SHA256: cda7b51dd44052437d62b757758ed2c83d9f5b470bd4ba5fa9d9a7cc1014dc41
 
 Package: oh-my-pi
-Version: 18.14.2-1
+Version: 18.15.0-1
 Architecture: aarch64
 Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
 Installed-Size: 2
@@ -68,11 +88,11 @@ Description: Oh-My-Pi - a coding agent with the IDE wired in
  Plugin manager for Pi - think oh-my-zsh but for Pi. Install themes,
  agents, commands, and tools with a single command. Uses glibc bridge
  for Termux compatibility. Binary downloaded on first run.
-Filename: pool/main/oh-my-pi_18.14.2-1_termux_aarch64.deb
+Filename: pool/main/oh-my-pi_18.15.0-1_termux_aarch64.deb
 Size: 2096
-MD5sum: b4415741b9c0d17ca37a7f51d18ac951
-SHA1: b9026c137a6af4f7d30d592028b2a06e8d05b5cd
-SHA256: 5daaabad8b5b9b4b6e9f176d72349a73b2be8eb15edf2507e8ab27c4b0def30a
+MD5sum: 05dd7fe466f6b1d57b9df7af03f8717a
+SHA1: b600f7cdc6c9a5108eab23569ec99366868a8365
+SHA256: d537250524f163d3599724eddf8911de131d3b14fd7cb1d2d87363f07681dfda
 
 Package: opencode
 Version: 2.2.5-1
