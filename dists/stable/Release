@@ -5,9 +5,9 @@ Architectures: aarch64 all
 Components: main
 Description: ticktessly custom termux repository
 Suite: stable
-Date: Mon, 02 Nov 2026 14:08:35 +0000
+Date: Mon, 02 Nov 2026 15:07:47 +0000
 SHA256:
- 9336948380df2f5c1af150de5f8a25783a464c7783a8b55a4d99b48540d2bc8e 4788 main/binary-aarch64/Packages
- f3a976f7655c0e86a616868e5a70500b4fb2a0078a67b2c7b8929d802d165118 2012 main/binary-aarch64/Packages.xz
+ 09d24ba720cea3a1fd746a854c2c164e12cd59a20f4c232839c11cb071991e4e 5516 main/binary-aarch64/Packages
+ 39752064bc89fc22fa9bb639d89f28047247e20e999a0ba8c7f997353bc4a1bb 2320 main/binary-aarch64/Packages.xz
  5e85b3ef93fdf60e8c3924b0300cca6685b45ebc35c752e1d8b4654c567891bd 796 main/binary-all/Packages
  67f10644da0f260430a5538b25c56d8bce73a46388d2a55ebe40315c4d58cebb 620 main/binary-all/Packages.xz
