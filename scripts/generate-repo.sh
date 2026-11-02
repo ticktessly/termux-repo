@@ -61,6 +61,14 @@ for arch_dir in "dists/${DIST}/${COMP}"/binary-*; do
         section=$(dpkg-deb -f "$deb" Section)
         priority=$(dpkg-deb -f "$deb" Priority)
         homepage=$(dpkg-deb -f "$deb" Homepage)
+        # VersionHash-relevant control fields. apt's version merge hash covers
+        # Installed-Size, Depends, Pre-Depends, Conflicts, Breaks and Replaces:
+        # dropping any of these from the stanza means equal versions never merge
+        # against dpkg's status, causing perpetual same-version "upgrades".
+        predepends=$(dpkg-deb -f "$deb" Pre-Depends)
+        conflicts=$(dpkg-deb -f "$deb" Conflicts)
+        breaks=$(dpkg-deb -f "$deb" Breaks)
+        replaces=$(dpkg-deb -f "$deb" Replaces)
         size=$(stat -c%s "$deb")
         # Installed-Size must come from the deb's own control data so it
         # matches what dpkg records in status at install time. apt's version
@@ -71,11 +79,20 @@ for arch_dir in "dists/${DIST}/${COMP}"/binary-*; do
         sha1=$(sha1sum "$deb" | cut -d' ' -f1)
         sha256=$(sha256sum "$deb" | cut -d' ' -f1)
 
+        # Fields from apt's version merge hash (see comment above) must be
+        # present in the stanza whenever the deb's control has them, otherwise
+        # dpkg's status will not merge with the index for equal versions.
         [ "$first" -eq 1 ] && first=0 || printf '\n' >> "$PKG_FILE"
 
-        printf 'Package: %s\nVersion: %s\nArchitecture: %s\nMaintainer: %s\nInstalled-Size: %s\nDepends: %s\nSection: %s\nPriority: %s\nHomepage: %s\nDescription: %s\nFilename: pool/%s/%s\nSize: %s\nMD5sum: %s\nSHA1: %s\nSHA256: %s\n' \
-            "$pkg" "$ver" "$arch" "$maint" "$isize" "$depends" "$section" "$priority" "$homepage" "$desc" "$COMP" "$deb_name" "$size" "$md5" "$sha1" "$sha256" \
-            >> "$PKG_FILE"
+        printf 'Package: %s\nVersion: %s\nArchitecture: %s\nMaintainer: %s\nInstalled-Size: %s\n' \
+            "$pkg" "$ver" "$arch" "$maint" "$isize" >> "$PKG_FILE"
+        [ -n "$predepends" ] && printf 'Pre-Depends: %s\n' "$predepends" >> "$PKG_FILE"
+        printf 'Depends: %s\n' "$depends" >> "$PKG_FILE"
+        [ -n "$conflicts" ] && printf 'Conflicts: %s\n' "$conflicts" >> "$PKG_FILE"
+        [ -n "$breaks" ] && printf 'Breaks: %s\n' "$breaks" >> "$PKG_FILE"
+        [ -n "$replaces" ] && printf 'Replaces: %s\n' "$replaces" >> "$PKG_FILE"
+        printf 'Section: %s\nPriority: %s\nHomepage: %s\nDescription: %s\nFilename: pool/%s/%s\nSize: %s\nMD5sum: %s\nSHA1: %s\nSHA256: %s\n' \
+            "$section" "$priority" "$homepage" "$desc" "$COMP" "$deb_name" "$size" "$md5" "$sha1" "$sha256" >> "$PKG_FILE"
     done
     xz -9kf "$PKG_FILE"
 done
