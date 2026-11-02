@@ -243,6 +243,7 @@ jobs:
           fi
           git rm -rf . 2>/dev/null || true
           git clean -fdx
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp -r /tmp/deploy/. .
           git add -A -f .
           git commit -m "Deploy $(date -u +%Y-%m-%d)" || true
