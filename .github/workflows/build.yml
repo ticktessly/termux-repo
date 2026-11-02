@@ -56,8 +56,8 @@ jobs:
               "antigravity-cli": "AGY_VERSION",
               "oh-my-pi": "OMP_VERSION",
               "copilot-cli": "COPILOT_CLI_VERSION",
-               "kilo-code": "KILO_VERSION",
-               "agentty": "AGENTTY_VERSION",
+              "kilo-code": "KILO_VERSION",
+              "agentty": "AGENTTY_VERSION",
            }
           expected = {}
           for package, env_key in package_env.items():
@@ -185,14 +185,14 @@ jobs:
         run: bash packages/copilot-cli/build.sh
 
       # --- kilo-code (glibc, bundled Bun SEA) ---
-       - name: Build kilo-code (aarch64)
-         if: steps.version-check.outputs.build_kilo_code == 'true'
-         run: bash packages/kilo-code/build.sh
+      - name: Build kilo-code (aarch64)
+        if: steps.version-check.outputs.build_kilo_code == 'true'
+        run: bash packages/kilo-code/build.sh
 
-       # --- agentty (native Bionic) ---
-       - name: Build agentty (aarch64)
-         if: steps.version-check.outputs.build_agentty == 'true'
-         run: bash packages/agentty/build.sh
+      # --- agentty (native Bionic) ---
+      - name: Build agentty (aarch64)
+        if: steps.version-check.outputs.build_agentty == 'true'
+        run: bash packages/agentty/build.sh
 
       - name: Compress large debs with upx if needed
         if: steps.version-check.outputs.build == 'true'
