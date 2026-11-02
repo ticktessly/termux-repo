@@ -85,6 +85,25 @@ This document details the architectural analysis, technical challenges, solution
 
 ---
 
+### `kilo-code` (Kilo Code CLI)
+- **Description:** Kilo Code's open source terminal AI coding agent (`kilo`/`kilocode`) — a fork of opencode v2 built by Kilo-Org on Bun.
+- **Upstream:** GitHub Releases `Kilo-Org/kilocode` (stable only; the `7.8.2x` line ships as prereleases) and npm `@kilocode/cli` (MIT-licensed). No official Termux/Android support: upstream issue #12445 ("Kilo CLI fails on Android / Termux (bionic, no glibc/musl runtime)") was closed `not_planned`.
+- **Binary Format:** Bun single-executable (BUN_1.2), glibc-only, ~247 MB uncompressed, distributed as `kilo-linux-arm64.tar.gz` (~81 MB) containing `kilo`, a console SPA, tree-sitter WASM parsers, bundled licenses, `bwrap` and sandbox helper scripts. The Bun SEA embeds its payload at fixed offsets, so it must never be stripped or re-located.
+- **Android / Termux Hurdles:**
+  1. **glibc-only runtime:** needs `ld-linux-aarch64.so.1` and `libc.so.6`; bionic cannot run it (same as opencode/copilot).
+  2. **Daemon self-spawn:** `kilo daemon start` re-executes `[process.execPath, "serve", ...]`; under an explicit loader launch `execPath` is the loader, so the spawn dies with exit 127 unless an `LD_PRELOAD` exec-spawn shim rewrites it.
+  3. **Missing assets under loader launch:** when `execPath` is the loader, the runtime cannot find the bundled `/console` and `/tree-sitter` assets next to it; wrappers must set `KILO_TREE_SITTER_WASM_DIR`/`KILO_CONSOLE_ASSET_DIR`.
+  4. **First-run daemon latency:** startup can exceed the daemon's internal 10 s timeout on device models fetch; retry or `KILO_NO_DAEMON=1` (embedded server fallback) works.
+- **Implemented Solutions (`packages/kilo-code/`):**
+  - **Bundled, checksum-verified release:** `build.sh` downloads `kilo-linux-arm64.tar.gz` + `kilo-cli-SHA256SUMS` from the release, verifies the SHA256, and installs `kilo` and all runtime assets into `$PREFIX/lib/kilo-code/` (MIT-licensed upstream, redistribution allowed — unlike copilot-cli, which must not be redistributed).
+  - **Loader + exec-spawn shim (same pattern as opencode v2):** `helper/execshim.c` intercepts `execve`/`execvpe`/`posix_spawn`/`posix_spawnp` and rewrites loader+`"serve"` spawns to `[loader, $KILO_BIN, serve, ...]`; other execs pass through. A constructor drops `LD_PRELOAD` from the environment so spawned bionic tools stay clean. Compiled with a glibc-targeting gcc.
+  - **Launcher (`helper/kilo.sh`):** execs `$PREFIX/glibc/lib/ld-linux-aarch64.so.1` on the untouched binary (no `patchelf`, no `LD_LIBRARY_PATH` needed), unsets bionic `LD_PRELOAD` pointers, sets `KILO_BIN`, `SSL_CERT_FILE`, `TMPDIR`, `KILO_DISABLE_AUTOUPDATE=1` (APT is the update channel; `kilo upgrade` disabled) and the asset-dir overrides listed above. `$PREFIX/bin/kilo` plus a `kilocode` symlink are provided.
+  - **Dependencies:** `glibc-repo`, `glibc`, `ripgrep` (prevents a glibc `rg` download), `git`, `nodejs-lts` (local MCP servers), `ca-certificates`, `bash`. No `proot`, no `patchelf`.
+  - **Validation (7.8.18, on-device):** `--version`, `--help`, `debug paths`, `serve`, `daemon start/status` (with the flag-based warmup workaround), and the TUI (`--mini`) in a pty all pass.
+- **Notes:** packaged as `kilo-code` (commands `kilo`/`kilocode`) with `Conflicts/Replaces: kilocode` for the earlier prototype. Deprecation risks: the daemon self-spawn argv shape and the asset-dir env names could change in future Bun/Kilo versions; the shim scope matches opencode's, which has been stable.
+
+---
+
 ## 2. Candidate Packages: Feasibility & Roadmap
 
 ### 1. `adguardhome` (AdGuard Home)

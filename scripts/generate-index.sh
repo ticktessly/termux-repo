@@ -328,8 +328,9 @@ ${TABLE_ROWS}    </tbody>
   <h2>Notes</h2>
   <div class="panel">
     <ul>
-      <li><code>opencode</code>, <code>antigravity-cli</code>, <code>oh-my-pi</code> and <code>copilot-cli</code> require <code>glibc-repo</code> and <code>glibc</code> &mdash; install with <code>pkg install glibc-repo</code>.</li>
+      <li><code>opencode</code>, <code>antigravity-cli</code>, <code>oh-my-pi</code>, <code>copilot-cli</code> and <code>kilo-code</code> require <code>glibc-repo</code> and <code>glibc</code> &mdash; install with <code>pkg install glibc-repo</code>.</li>
       <li><code>copilot-cli</code> downloads the official glibc binary from GitHub releases at install time and verifies its checksum; it is not redistributed here.</li>
+      <li><code>kilo-code</code> bundles the upstream MIT-licensed Kilo Code CLI binary and assets; updates come from APT, not <code>kilo upgrade</code>.</li>
       <li><code>muse-code</code> requires <code>proot</code> for syscall emulation.</li>
       <li>Architectures published: ${ARCH_LIST}</li>
     </ul>

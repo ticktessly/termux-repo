@@ -167,6 +167,19 @@ export_var OMP_VERSION "$(latest_release can1357/oh-my-pi)"
 # --- copilot-cli: latest release of github/copilot-cli ---
 export_var COPILOT_CLI_VERSION "$(latest_release github/copilot-cli)"
 
+# --- kilo-code: latest stable GitHub release of Kilo-Org/kilocode.
+#     /releases/latest already skips prereleases (e.g. the 7.8.2x RCs);
+#     fall back to the npm 'latest' dist-tag of @kilocode/cli. ---
+KILO_VER="$(latest_release Kilo-Org/kilocode)"
+if [ -z "$KILO_VER" ]; then
+    KILO_VER="$(http_get "https://registry.npmjs.org/@kilocode%2Fcli/latest" \
+        | python3 -c '
+import json,sys
+try: print(json.load(sys.stdin).get("version",""))
+except Exception: print("")' || true)"
+fi
+export_var KILO_VERSION "$KILO_VER"
+
 # --- antigravity-cli: Google's auto-updater manifest ---
 AGY_MANIFEST="$(http_get "https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_arm64.json" || true)"
 AGY_REALVER="$(printf '%s' "$AGY_MANIFEST" | python3 -c 'import json,sys;print(json.load(sys.stdin).get("version",""))' || true)"

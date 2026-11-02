@@ -56,6 +56,7 @@ jobs:
               "antigravity-cli": "AGY_VERSION",
               "oh-my-pi": "OMP_VERSION",
               "copilot-cli": "COPILOT_CLI_VERSION",
+              "kilo-code": "KILO_VERSION",
           }
           expected = {}
           for package, env_key in package_env.items():
@@ -182,6 +183,11 @@ jobs:
         if: steps.version-check.outputs.build_copilot_cli == 'true'
         run: bash packages/copilot-cli/build.sh
 
+      # --- kilo-code (glibc, bundled Bun SEA) ---
+      - name: Build kilo-code (aarch64)
+        if: steps.version-check.outputs.build_kilo_code == 'true'
+        run: bash packages/kilo-code/build.sh
+
       - name: Compress large debs with upx if needed
         if: steps.version-check.outputs.build == 'true'
         run: |
@@ -192,6 +198,11 @@ jobs:
               tmpdir=$(mktemp -d)
               dpkg-deb -x "$deb" "$tmpdir"
               find "$tmpdir" -type f -executable | while read bin; do
+                # Never run UPX on Bun single-executables: the payload is
+                # embedded at fixed offsets and UPX corrupts them.
+                case "$bin" in
+                  */lib/kilo-code/kilo | */lib/opencode/opencode-bin) continue ;;
+                esac
                 if file "$bin" | grep -q "ELF"; then
                   upx --best --lzma "$bin" 2>/dev/null || true
                 fi
