@@ -264,14 +264,14 @@ jobs:
           touch /tmp/deploy/.nojekyll
           git fetch origin gh-pages --depth=1 2>/dev/null || true
           git reset --hard HEAD
-          git clean -fdx
+          git clean -ffdx
           if git rev-parse --verify origin/gh-pages >/dev/null 2>&1; then
             git checkout -B gh-pages origin/gh-pages
           else
             git checkout --orphan gh-pages
           fi
           git rm -rf . 2>/dev/null || true
-          git clean -fdx
+          git clean -ffdx
           cp -r /tmp/deploy/. .
           git add -A -f .
           git commit -m "Deploy $(date -u +%Y-%m-%d)" || true
