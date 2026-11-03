@@ -52,10 +52,16 @@ jobs:
               "kilo-code": "KILO_VERSION",
               "agentty": "AGENTTY_VERSION",
           }
+          # agentty carries its own package revision so a local fix can ship
+          # as 0.9.40-2 without waiting for upstream.
+          pkgrel = {
+              "agentty": (os.environ.get("AGENTTY_PKGREL") or "1").strip(),
+          }
           expected = {}
           for package, env_key in package_env.items():
               resolved = (os.environ.get(env_key) or "").strip()
-              expected[package] = f"{resolved}-1" if resolved else ""
+              rel = pkgrel.get(package, "1")
+              expected[package] = f"{resolved}-{rel}" if resolved else ""
 
           try:
               packages = subprocess.check_output(
@@ -133,7 +139,11 @@ jobs:
       # --- agentty: NDK cross-compile ---
       - name: Read agentty version
         if: steps.version-check.outputs.build_agentty == 'true'
-        run: echo "AGENTTY_VERSION=$(cat packages/agentty/VERSION)" >> "$GITHUB_ENV"
+        run: |
+          {
+            echo "AGENTTY_VERSION=$(cat packages/agentty/VERSION)"
+            echo "AGENTTY_PKGREL=$(cat packages/agentty/PKGREL)"
+          } >> "$GITHUB_ENV"
 
       - name: Set up NDK r30
         if: steps.version-check.outputs.build_agentty == 'true'
@@ -154,9 +164,28 @@ jobs:
       - name: Apply Android patches
         if: steps.version-check.outputs.build_agentty == 'true'
         run: |
-          git -C agentty-src/third_party/maya/third_party/jaal apply --3way "$GITHUB_WORKSPACE/packages/agentty/android-epoll.patch" || \
-          git -C agentty-src/third_party/maya/third_party/jaal apply --reject --whitespace=fix "$GITHUB_WORKSPACE/packages/agentty/android-epoll.patch" || true
-          git -C agentty-src/third_party/claybin apply --3way "$GITHUB_WORKSPACE/packages/agentty/android-claybin.patch" || true
+          # Strict apply: a patch that no longer matches must fail the build,
+          # not silently ship a binary that still crashes on Android.
+          git -C agentty-src/third_party/claybin apply \
+            "$GITHUB_WORKSPACE/packages/agentty/android-probe.patch"
+
+          # Assert the guard actually landed. Without it, clay::probe_host()
+          # issues landlock_create_ruleset (444), which Android's seccomp
+          # policy answers with SIGSYS before the TUI can start.
+          grep -q 'defined(__ANDROID__)' \
+            agentty-src/third_party/claybin/src/plan/probe.cpp
+
+          # The epoll/claybin CMake fixes now live upstream. If a future
+          # version pins an older submodule, fail here with a clear message
+          # instead of at link time.
+          for f in \
+            agentty-src/third_party/maya/third_party/jaal/CMakeLists.txt \
+            agentty-src/third_party/claybin/CMakeLists.txt; do
+            grep -q 'CMAKE_SYSTEM_NAME STREQUAL "Android"' "$f" || {
+              echo "Error: $f does not recognise Android; re-add the old patch" >&2
+              exit 1
+            }
+          done
 
       - name: Build OpenSSL + nghttp2 for Android
         if: steps.version-check.outputs.build_agentty == 'true'

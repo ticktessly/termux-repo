@@ -1,0 +1,27 @@
+diff --git a/src/plan/probe.cpp b/src/plan/probe.cpp
+index 59ce85e..c592efa 100644
+--- a/src/plan/probe.cpp
++++ b/src/plan/probe.cpp
+@@ -147,6 +147,14 @@ bool probe_kvm() {
+ }  // namespace
+ 
+ HostCapabilities probe_host() {
++#if defined(__ANDROID__)
++    // Android's per-app seccomp filter kills the process with SIGSYS when
++    // landlock_create_ruleset (444) is issued, instead of returning ENOSYS.
++    // The probes below would never get an answer, and unprivileged Termux
++    // cannot use any claybin mechanism anyway, so report "none" without
++    // touching the kernel.
++    return HostCapabilities::none();
++#else
+     HostCapabilities h;
+     h.user_namespaces = probe_userns();
+ 
+@@ -183,6 +191,7 @@ HostCapabilities probe_host() {
+     h.landlock_abi = probe_landlock_abi();
+     h.no_new_privs = probe_no_new_privs();
+     return h;
++#endif
+ }
+ 
+ #else

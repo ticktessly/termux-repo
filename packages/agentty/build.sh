@@ -18,7 +18,7 @@ DEBS_DIR="$REPO_ROOT/debs"
 mkdir -p "$DEBS_DIR"
 
 VERSION="${AGENTTY_VERSION:-$(cat "$SCRIPT_DIR/VERSION")}"
-PKGREL="${AGENTTY_PKGREL:-1}"
+PKGREL="${AGENTTY_PKGREL:-$(cat "$SCRIPT_DIR/PKGREL" 2>/dev/null || echo 1)}"
 DEB_VERSION="${VERSION}-${PKGREL}"
 PREFIX="data/data/com.termux/files/usr"
 ARCH="${1:-aarch64}"
