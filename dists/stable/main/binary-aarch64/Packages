@@ -1,8 +1,8 @@
 Package: agentty
-Version: 0.9.40-1
+Version: 0.9.40-2
 Architecture: aarch64
 Maintainer: Twilight <twilight@aliveos.org>
-Installed-Size: 22193
+Installed-Size: 22191
 Depends: openssl, libnghttp2, libc++
 Section: devel
 Priority: optional
@@ -11,11 +11,11 @@ Description: Blazing-fast AI pair programming in your terminal
  Native Bionic C++ agent (no proot): one static-ish binary with local
  RAG, any-model providers (including OpenAI-compatible endpoints),
  MCP support and agent skills. Run 'agentty' then /connect.
-Filename: pool/main/agentty_0.9.40-1_termux_aarch64.deb
-Size: 5238768
-MD5sum: 018bfcbc4666b3b3f443efb22c9fa21b
-SHA1: f9cbbd07e30a97782e32de5f5296a425877666a1
-SHA256: 293fefbdd6507c5bb943154c73ce10336977e15268e34929f3e7ea5752acdc44
+Filename: pool/main/agentty_0.9.40-2_termux_aarch64.deb
+Size: 5234912
+MD5sum: e8d26d15f1e65f5f9284b1a3c0d20bdf
+SHA1: 8b3214905d2efa8c0470913cc73dd426d5b7cd5d
+SHA256: f47f3863889c92c4f41fac014c8a8ffac9ea0c8e5c2f8abceea79fe274bb5be3
 
 Package: antigravity-cli
 Version: 1.4.12-1
