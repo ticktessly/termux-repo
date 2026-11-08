@@ -57,10 +57,10 @@ SHA1: 5125cf2a78cff616f2f9baaa2aaabbfbd0d35889
 SHA256: 6ad2b5fca19df165090fca024ab78fa457c1a5cef53099e720637d37b3ade8cb
 
 Package: kilo-code
-Version: 7.8.18-1
+Version: 7.8.27-1
 Architecture: aarch64
 Maintainer: ticktessly <246650556+ticktessly@users.noreply.github.com>
-Installed-Size: 318386
+Installed-Size: 318324
 Depends: glibc-repo, glibc, ripgrep, git, nodejs-lts, ca-certificates, bash
 Conflicts: kilocode
 Replaces: kilocode
@@ -72,11 +72,11 @@ Description: Kilo Code CLI - open source AI coding agent for the terminal
  and the CLI. This package runs the upstream glibc binary on Termux's glibc
  bridge with an exec-spawn shim; no proot required. The binary and its
  runtime assets are bundled; update via APT, not 'kilo upgrade'.
-Filename: pool/main/kilo-code_7.8.18-1_termux_aarch64.deb
-Size: 54414784
-MD5sum: 798c0fc8991f2dedce33c7280431c298
-SHA1: 02437de6a27260d4b0fb90769326959a22da181a
-SHA256: 8b0b9d707f8196cc23611e1e361d63ff0b619e87274b88889c35e8fba27b7f0d
+Filename: pool/main/kilo-code_7.8.27-1_termux_aarch64.deb
+Size: 54458596
+MD5sum: 0f0ac8b3f30231ff0843b83921f26be1
+SHA1: a2e0cbb2004d6e9a44263cc11b39065a3f2aeb06
+SHA256: 2ac62c80e499ffcd76c94fcd7ec30aa54994c3f5008b8e15e4a79840463df5df
 
 Package: muse-code
 Version: 1.4.14.r7309.1-1
